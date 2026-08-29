@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+import json, os, time, uuid
+from datetime import datetime, timezone
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+from pathlib import Path
+from urllib.parse import urlparse
+ROOT=Path(__file__).resolve().parent; DATA=ROOT/'data.json'; ARCHIVE=ROOT/'archive'; PORT=int(os.environ.get('MECH_CLOCK_PORT','8787'))
+def now(): return datetime.now(timezone.utc).isoformat()
+def fresh():
+ return {'version':2,'createdAt':now(),'updatedAt':now(),'activeShift':None,'days':{},'presets':{'work':['Oil change','Rotate tires','Brakes','Alignment','Change tires','Flat repair','Replace bulbs','Replace filters','Torque tires','Diagnostic','Road test','Inspection','Battery','Wipers','Mount/balance','TPMS','Cleanup'],'downtime':['Wait for part','Wait for RO/approval','Advisor/customer','Drink','Snack','Bathroom','Tool run','Bay cleanup','Parts counter','Lift/setup wait'],'breaks':['Lunch','Break']}}
+def day(): return datetime.now(timezone.utc).date().isoformat()
+
+def dur_ms(a,b):
+ if not a: return 0
+ try:
+  aa=datetime.fromisoformat(str(a).replace('Z','+00:00')); bb=datetime.fromisoformat(str(b or now()).replace('Z','+00:00')); return max(0,int((bb-aa).total_seconds()*1000))
+ except Exception: return 0
+def month_key(ts=None):
+ try:
+  dt=datetime.fromisoformat((ts or now()).replace('Z','+00:00'))
+ except Exception:
+  dt=datetime.now(timezone.utc)
+ return dt.strftime('%Y-%m')
+def archive_snapshot(s):
+ mk=month_key(); folder=ARCHIVE/mk; folder.mkdir(parents=True,exist_ok=True)
+ stamp=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M-%SZ')
+ snapshot=folder/(f'torqueclock-{stamp}.json'); summary=folder/'monthly-summary.json'
+ jobs=[]; shifts=0; work_ms=wait_ms=break_ms=0
+ for dayrec in s.get('days',{}).values():
+  if not str(dayrec.get('date','')).startswith(mk): continue
+  for sh in dayrec.get('shifts',[]):
+   shifts+=1
+   for b in sh.get('breaks',[]): break_ms+=dur_ms(b.get('start'),b.get('end'))
+   for j in sh.get('jobs',[]):
+    js={'id':j.get('id'),'vehicle':j.get('vehicle'),'title':j.get('title'),'ro':j.get('ro'),'start':j.get('start'),'end':j.get('end'),'status':j.get('status'),'tasks':[]}
+    for t in j.get('tasks',[]):
+     tms=sum(dur_ms(seg.get('start'),seg.get('end')) for seg in t.get('segments',[])); work_ms+=tms; js['tasks'].append({'label':t.get('label'),'status':t.get('status'),'ms':tms})
+    for w in j.get('waits',[]): wait_ms+=dur_ms(w.get('start'),w.get('end'))
+    jobs.append(js)
+ payload={'exportedAt':now(),'month':mk,'source':'TorqueClock','state':s}
+ snapshot.write_text(json.dumps(payload,indent=2)); summary.write_text(json.dumps({'updatedAt':now(),'month':mk,'shifts':shifts,'jobs':len(jobs),'workMs':work_ms,'waitMs':wait_ms,'breakMs':break_ms,'jobRows':jobs},indent=2))
+ return {'month':mk,'snapshot':str(snapshot.relative_to(ROOT)),'summary':str(summary.relative_to(ROOT)),'jobs':len(jobs),'shifts':shifts}
+def save(s):
+ s['updatedAt']=now(); tmp=DATA.with_suffix('.tmp'); tmp.write_text(json.dumps(s,indent=2)); tmp.replace(DATA)
+def normalize_job(j):
+ j.setdefault('tasks',[]); j.setdefault('waits',[]); j.setdefault('notes',[]); j.setdefault('segments',[]); j.setdefault('status','active' if j.get('end') is None else 'done')
+ j.setdefault('make',''); j.setdefault('model',''); j.setdefault('year','');
+ if not j.get('vehicle'):
+  j['vehicle']=' '.join(str(x).strip() for x in [j.get('year'),j.get('make'),j.get('model')] if str(x).strip())
+ if not j['tasks']:
+  labels=[]
+  for seg in j.get('segments',[]):
+   if seg.get('type')=='work' and seg.get('label') not in labels: labels.append(seg.get('label') or 'Work')
+  if not labels: labels=[j.get('title') or 'Shop job']
+  j['tasks']=[{'id':str(uuid.uuid4()),'label':x,'status':'queued','segments':[]} for x in labels]
+ return j
+def load():
+ if not DATA.exists():
+  s=fresh(); save(s); return s
+ try: s=json.loads(DATA.read_text())
+ except Exception:
+  bak=DATA.with_suffix('.corrupt-%d.json'%int(time.time())); DATA.rename(bak); s=fresh(); s['recoveredFrom']=bak.name; save(s)
+ base=fresh(); s.setdefault('days',{}); s.setdefault('presets',base['presets']); s['presets'].setdefault('breaks',base['presets']['breaks']); s['version']=2
+ for d in s['days'].values():
+  for sh in d.get('shifts',[]):
+   sh.setdefault('breaks',[]); sh.setdefault('lunches',[]); sh.setdefault('jobs',[]); sh.setdefault('notes',[])
+   for j in sh.get('jobs',[]): normalize_job(j)
+ if s.get('activeShift') and s['activeShift'].get('id'):
+  aid=s['activeShift']['id']
+  for d in s['days'].values():
+   for i,sh in enumerate(d.get('shifts',[])):
+    if sh.get('id')==aid:
+     merged={**sh,**s['activeShift']}; merged.setdefault('breaks',[])
+     for j in merged.get('jobs',[]): normalize_job(j)
+     d['shifts'][i]=merged; s['activeShift']=merged; return s
+ return s
+def today(s):
+ k=day(); s['days'].setdefault(k,{'date':k,'shifts':[],'notes':[]}); return s['days'][k]
+def active_job(sh):
+ if not sh: return None
+ for j in reversed(sh.get('jobs',[])):
+  if j.get('end') is None and j.get('status','active')!='hold': return normalize_job(j)
+def held_jobs(sh):
+ if not sh: return []
+ return [normalize_job(j) for j in sh.get('jobs',[]) if j.get('end') is None and j.get('status')=='hold']
+def find_job(sh,jid):
+ if not sh: return None
+ for j in sh.get('jobs',[]):
+  if j.get('id')==jid: return normalize_job(j)
+def active_task(j):
+ if not j: return None
+ for t in j.get('tasks',[]):
+  if t.get('segments') and t['segments'][-1].get('end') is None: return t
+def find_task(j,tid):
+ if not j: return None
+ for t in j.get('tasks',[]):
+  if t.get('id')==tid: return t
+def close_task(t,at):
+ if t and t.get('segments') and t['segments'][-1].get('end') is None: t['segments'][-1]['end']=at
+def close_wait(j,at):
+ if j and j.get('waits') and j['waits'][-1].get('end') is None: j['waits'][-1]['end']=at
+def close_break(sh,at):
+ if sh and sh.get('breaks') and sh['breaks'][-1].get('end') is None: sh['breaks'][-1]['end']=at
+def resume_task(j,tid,at):
+ if not j or not tid: return False
+ t=find_task(j,tid)
+ if not t or t.get('status')=='done': return False
+ close_wait(j,at); close_task(active_task(j),at); t['status']='running'; t.setdefault('segments',[]).append({'id':str(uuid.uuid4()),'start':at,'end':None}); return True
+def mutate(s,p):
+ a=p.get('action'); at=now(); d=today(s); sh=s.get('activeShift')
+ if a=='startShift':
+  if sh: return False,'Shift already running'
+  sh={'id':str(uuid.uuid4()),'start':at,'end':None,'breaks':[],'lunches':[],'jobs':[],'notes':[],'label':p.get('label','Work shift')}; s['activeShift']=sh; d['shifts'].append(sh)
+ elif a=='stopShift':
+  if not sh: return False,'No active shift'
+  close_break(sh,at)
+  for j in sh.get('jobs',[]):
+   if j.get('end') is None:
+    close_wait(j,at); close_task(active_task(j),at); j['end']=at; j['status']='done'
+  sh['end']=at; s['activeShift']=None
+ elif a in ('startLunch','startBreak'):
+  if not sh: return False,'Start work first'
+  kind='Lunch' if a=='startLunch' else ((p.get('label') or 'Break').strip() or 'Break')
+  j=active_job(sh); t=active_task(j); sh['resumeJobId']=j.get('id') if j else ''; sh['resumeTaskId']=t.get('id') if t else ''; close_wait(j,at); close_task(t,at)
+  rec={'id':str(uuid.uuid4()),'label':kind,'start':at,'end':None}; sh.setdefault('breaks',[]).append(rec)
+  if kind=='Lunch': sh.setdefault('lunches',[]).append({'id':rec['id'],'start':at,'end':None})
+ elif a in ('endLunch','endBreak'):
+  if not sh: return False,'No active shift'
+  open_break=None
+  for b in reversed(sh.get('breaks',[])):
+   if b.get('end') is None: open_break=b; break
+  if not open_break: return False,'No break/lunch running'
+  open_break['end']=at
+  for l in sh.get('lunches',[]):
+   if l.get('id')==open_break.get('id') and l.get('end') is None: l['end']=at
+  j=find_job(sh,sh.get('resumeJobId')) or active_job(sh); resume_task(j,sh.get('resumeTaskId'),at); sh['resumeJobId']=''; sh['resumeTaskId']=''
+ elif a=='startJob':
+  if not sh: return False,'Start work first'
+  old=active_job(sh); oldt=active_task(old); close_wait(old,at); close_task(oldt,at)
+  if old:
+   if len(held_jobs(sh))>=3: return False,'Hold/finish one of the 3 parked vehicles first'
+   old['resumeTaskId']=oldt.get('id') if oldt else old.get('resumeTaskId',''); old['status']='hold'; old['heldAt']=at
+  title=(p.get('title') or '').strip() or 'Shop job'; items=[x.strip() for x in p.get('items',[]) if str(x).strip()]
+  if not items: items=[title]
+  make=(p.get('make') or '').strip(); model=(p.get('model') or '').strip(); year=(p.get('year') or '').strip(); vehicle=(p.get('vehicle') or '').strip() or ' '.join(x for x in [year,make,model] if x)
+  tasks=[{'id':str(uuid.uuid4()),'label':x,'status':'queued','segments':[]} for x in items]
+  j={'id':str(uuid.uuid4()),'vehicle':vehicle,'make':make,'model':model,'year':year,'ro':(p.get('ro') or '').strip(),'title':title,'start':at,'end':None,'status':'active','tasks':tasks,'waits':[],'segments':[],'notes':[]}; sh['jobs'].append(j)
+ elif a=='holdJob':
+  if not sh: return False,'Start work first'
+  j=active_job(sh)
+  if not j: return False,'No active job to hold'
+  if len(held_jobs(sh))>=3: return False,'Already holding 3 vehicles'
+  t=active_task(j); j['resumeTaskId']=t.get('id') if t else j.get('resumeTaskId',''); close_wait(j,at); close_task(t,at); j['status']='hold'; j['heldAt']=at
+ elif a=='resumeJob':
+  if not sh: return False,'Start work first'
+  target=find_job(sh,p.get('jobId'))
+  if not target or target.get('status')!='hold' or target.get('end') is not None: return False,'Held vehicle not found'
+  old=active_job(sh); close_wait(old,at); close_task(active_task(old),at)
+  if old: old['status']='hold'; old['heldAt']=at
+  target['status']='active'; target['resumedAt']=at; resume_task(target,target.get('resumeTaskId'),at); target['resumeTaskId']=''
+ elif a=='endJob':
+  j=active_job(sh)
+  if not j: return False,'No active job'
+  close_wait(j,at); close_task(active_task(j),at); j['end']=at; j['status']='done'
+ elif a=='startTask':
+  j=active_job(sh); t=find_task(j,p.get('taskId'))
+  if not t: return False,'Pick a job item first'
+  close_wait(j,at); close_task(active_task(j),at); t['status']='running'; t.setdefault('segments',[]).append({'id':str(uuid.uuid4()),'start':at,'end':None})
+ elif a=='pauseTask':
+  j=active_job(sh); t=find_task(j,p.get('taskId')) or active_task(j)
+  if not t: return False,'No running item to pause'
+  close_task(t,at); t['status']='paused'
+ elif a=='continueTask':
+  j=active_job(sh); t=find_task(j,p.get('taskId'))
+  if not t: return False,'Pick an item to continue'
+  close_wait(j,at); close_task(active_task(j),at); t['status']='running'; t.setdefault('segments',[]).append({'id':str(uuid.uuid4()),'start':at,'end':None})
+ elif a=='stopTask':
+  j=active_job(sh); t=find_task(j,p.get('taskId')) or active_task(j)
+  if not t: return False,'No item to stop'
+  close_task(t,at); t['status']='done'
+ elif a=='startWait':
+  j=active_job(sh)
+  if not j: return False,'Start a job first'
+  t=active_task(j); close_task(t,at); close_wait(j,at); label=(p.get('label') or 'Wait').strip() or 'Wait'; j.setdefault('waits',[]).append({'id':str(uuid.uuid4()),'label':label,'start':at,'end':None,'resumeTaskId':t.get('id') if t else ''})
+ elif a=='deleteTask':
+  j=active_job(sh) or find_job(sh,p.get('jobId'))
+  if not j and sh:
+   for jj in sh.get('jobs',[]):
+    if find_task(jj,p.get('taskId')): j=jj; break
+  if not j: return False,'No job found'
+  tid=p.get('taskId'); before=len(j.get('tasks',[])); j['tasks']=[t for t in j.get('tasks',[]) if t.get('id')!=tid]
+  if len(j['tasks'])==before: return False,'W/O item not found'
+ elif a=='deleteJob':
+  jid=p.get('jobId'); pools=[]
+  for dd in s.get('days',{}).values(): pools.extend(dd.get('shifts',[]))
+  before=sum(len(x.get('jobs',[])) for x in pools if x)
+  for x in pools:
+   if x: x['jobs']=[j for j in x.get('jobs',[]) if j.get('id')!=jid]
+  after=sum(len(x.get('jobs',[])) for x in pools if x)
+  if after==before: return False,'Vehicle/job not found'
+ elif a=='endWait':
+  j=active_job(sh)
+  if not j or not j.get('waits') or j['waits'][-1].get('end') is not None: return False,'No wait running'
+  tid=j['waits'][-1].get('resumeTaskId'); close_wait(j,at); resume_task(j,tid,at)
+ elif a=='startSegment':
+  j=active_job(sh)
+  if not j: return False,'Start a job first'
+  typ=p.get('type','work'); label=(p.get('label') or '').strip() or 'Work'
+  if typ=='downtime':
+   close_task(active_task(j),at); close_wait(j,at); j.setdefault('waits',[]).append({'id':str(uuid.uuid4()),'label':label,'start':at,'end':None})
+  else:
+   t={'id':str(uuid.uuid4()),'label':label,'status':'running','segments':[{'id':str(uuid.uuid4()),'start':at,'end':None}]}; close_task(active_task(j),at); j.setdefault('tasks',[]).append(t)
+ elif a=='archiveSnapshot':
+  info=archive_snapshot(s); s['lastArchive']=info
+ elif a=='addNote':
+  txt=(p.get('text') or '').strip()
+  if not txt: return False,'Empty note'
+  note={'id':str(uuid.uuid4()),'at':at,'text':txt}; j=active_job(sh)
+  (j.setdefault('notes',[]) if p.get('target')=='job' and j else sh.setdefault('notes',[]) if sh else d.setdefault('notes',[])).append(note)
+ else: return False,'Unknown action'
+ save(s); return True,'ok'
+class H(BaseHTTPRequestHandler):
+ def log_message(self,format,*args): print('%s - %s'%(self.address_string(),format%args),flush=True)
+ def sendx(self,code,body,ctype='application/json',head=False):
+  raw=body if isinstance(body,bytes) else (json.dumps(body).encode() if ctype=='application/json' else str(body).encode()); self.send_response(code); self.send_header('Content-Type',ctype); self.send_header('Cache-Control','no-store' if ctype=='application/json' else 'public, max-age=60'); self.send_header('Content-Length',str(len(raw))); self.end_headers();
+  if not head: self.wfile.write(raw)
+ def static_response(self,p,head=False):
+  if p.startswith('/api/state'): return self.sendx(200,load(),head=head)
+  if p.startswith('/health'): return self.sendx(200,{'ok':True,'port':PORT,'updatedAt':load().get('updatedAt')},head=head)
+  if p=='/': p='/index.html'
+  f=(ROOT/'public'/p.lstrip('/')).resolve(); base=(ROOT/'public').resolve()
+  if not str(f).startswith(str(base)) or not f.exists(): return self.sendx(404,'Not found','text/plain',head=head)
+  c={'html':'text/html','css':'text/css','js':'application/javascript','svg':'image/svg+xml','webmanifest':'application/manifest+json'}.get(f.name.split('.')[-1],'text/plain')
+  self.sendx(200,f.read_bytes(),c,head=head)
+ def do_HEAD(self): return self.static_response(urlparse(self.path).path,head=True)
+ def do_GET(self):
+  p=urlparse(self.path).path
+  if p.startswith('/api/state'): return self.sendx(200,load())
+  if p.startswith('/health'): return self.sendx(200,{'ok':True,'port':PORT,'updatedAt':load().get('updatedAt')})
+  if p=='/': p='/index.html'
+  f=(ROOT/'public'/p.lstrip('/')).resolve(); base=(ROOT/'public').resolve()
+  if not str(f).startswith(str(base)) or not f.exists(): return self.sendx(404,'Not found','text/plain')
+  c={'html':'text/html','css':'text/css','js':'application/javascript','svg':'image/svg+xml','webmanifest':'application/manifest+json'}.get(f.name.split('.')[-1],'text/plain')
+  self.sendx(200,f.read_bytes(),c)
+ def do_POST(self):
+  if not urlparse(self.path).path.startswith('/api/action'): return self.sendx(404,{'ok':False,'error':'not found'})
+  try: p=json.loads(self.rfile.read(int(self.headers.get('Content-Length','0') or 0)) or b'{}')
+  except Exception: return self.sendx(400,{'ok':False,'error':'bad json'})
+  s=load(); ok,msg=mutate(s,p); self.sendx(200 if ok else 400,{'ok':ok,'message':msg,'state':load()})
+if __name__=='__main__':
+ print(f'TorqueClock listening on 0.0.0.0:{PORT}',flush=True); ThreadingHTTPServer(('0.0.0.0',PORT),H).serve_forever()

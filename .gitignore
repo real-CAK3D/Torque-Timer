@@ -1,0 +1,14 @@
+# Local runtime state
+data.json
+data.tmp
+*.corrupt-*.json
+
+# Python/runtime clutter
+__pycache__/
+*.pyc
+
+# OS/editor
+.DS_Store
+.vscode/
+
+# Archive snapshots are intentionally trackable under archive/YYYY-MM/
