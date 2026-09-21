@@ -1,19 +1,19 @@
 # TorqueClock Mechanic Time
 
-Phone-first mechanic shift/job timer served on Tailscale port `8799`.
+Phone-first mechanic shift/job timer served on Tailscale port `8800`.
 
 ## Live runtime
 
 - App path: `/home/ubuntu/mechanic-clock`
 - Service: `torqueclock.service`
-- Local URL: `http://127.0.0.1:8799/`
-- Tailnet URL: `http://100.82.165.23:8799/`
+- Local URL: `http://127.0.0.1:8800/`
+- Tailnet URL: `http://100.82.165.23:8800/`
 - Runtime data: `data.json` (ignored by git)
 
 Run manually:
 
 ```bash
-MECH_CLOCK_PORT=8799 python3 app.py
+MECH_CLOCK_PORT=8800 python3 app.py
 ```
 
 Restart service:
