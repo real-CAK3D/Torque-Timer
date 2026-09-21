@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 ROOT=Path(__file__).resolve().parent; DATA=ROOT/'data.json'; ARCHIVE=ROOT/'archive'; PORT=int(os.environ.get('MECH_CLOCK_PORT','8787'))
 def now(): return datetime.now(timezone.utc).isoformat()
 def fresh():
- return {'version':5,'createdAt':now(),'updatedAt':now(),'activeShift':None,'days':{},'schedule':{},'presets':{'work':['Oil change','Rotate tires','Brakes','Alignment','Change tires','Flat repair','Replace bulbs','Replace filters','Torque tires','Diagnostic','Road test','Inspection','Battery','Wipers','Mount/balance','TPMS','Cleanup'],'downtime':['Wait for part','Wait for RO/approval','Advisor/customer','Drink','Snack','Bathroom','Tool run','Bay cleanup','Parts counter','Lift/setup wait','Double Torque'],'breaks':['Lunch','Break']}}
+ return {'version':5,'createdAt':now(),'updatedAt':now(),'activeShift':None,'days':{},'schedule':{},'presets':{'work':['Oil change','Rotate tires','Brakes','Alignment','Change tires','Flat repair','Replace bulbs','Replace filters','Torque tires','Diagnostic','Road test','Inspection','Battery','Wipers','Mount/balance','TPMS','Cleanup'],'downtime':['Wait for part','Wait for RO/approval','Advisor/customer','Drink','Snack','Bathroom','Tool run','Bay cleanup','Parts counter','Lift/setup wait','Double Torque'],'breaks':['Lunch','Break'],'book':{}}}
 def day(): return datetime.now(timezone.utc).date().isoformat()
 
 def dur_ms(a,b):
@@ -25,7 +25,8 @@ def archive_snapshot(s):
  mk=month_key(); folder=ARCHIVE/mk; folder.mkdir(parents=True,exist_ok=True)
  stamp=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M-%SZ')
  snapshot=folder/(f'torqueclock-{stamp}.json'); summary=folder/'monthly-summary.json'
- jobs=[]; shifts=0; work_ms=wait_ms=break_ms=0
+ book=s.get('presets',{}).get('book',{}) or {}
+ jobs=[]; shifts=0; work_ms=wait_ms=break_ms=billed_ms=0
  for dayrec in s.get('days',{}).values():
   if not str(dayrec.get('date','')).startswith(mk): continue
   for sh in dayrec.get('shifts',[]):
@@ -34,11 +35,15 @@ def archive_snapshot(s):
    for j in sh.get('jobs',[]):
     js={'id':j.get('id'),'vehicle':j.get('vehicle'),'title':j.get('title'),'ro':j.get('ro'),'start':j.get('start'),'end':j.get('end'),'status':j.get('status'),'tasks':[]}
     for t in j.get('tasks',[]):
-     tms=sum(dur_ms(seg.get('start'),seg.get('end')) for seg in t.get('segments',[])); work_ms+=tms; js['tasks'].append({'label':t.get('label'),'status':t.get('status'),'ms':tms})
+     tms=sum(dur_ms(seg.get('start'),seg.get('end')) for seg in t.get('segments',[])); work_ms+=tms
+     bms=int(float(book.get(t.get('label'),0) or 0)*3600000)
+     if t.get('status')=='done' and bms: billed_ms+=bms
+     js['tasks'].append({'label':t.get('label'),'status':t.get('status'),'ms':tms,'bookMs':bms})
     for w in j.get('waits',[]): wait_ms+=dur_ms(w.get('start'),w.get('end'))
     jobs.append(js)
+ eff=round(billed_ms/work_ms*100,1) if work_ms else None
  payload={'exportedAt':now(),'month':mk,'source':'TorqueClock','state':s}
- snapshot.write_text(json.dumps(payload,indent=2)); summary.write_text(json.dumps({'updatedAt':now(),'month':mk,'shifts':shifts,'jobs':len(jobs),'workMs':work_ms,'waitMs':wait_ms,'breakMs':break_ms,'jobRows':jobs},indent=2))
+ snapshot.write_text(json.dumps(payload,indent=2)); summary.write_text(json.dumps({'updatedAt':now(),'month':mk,'shifts':shifts,'jobs':len(jobs),'workMs':work_ms,'waitMs':wait_ms,'breakMs':break_ms,'billedMs':billed_ms,'efficiencyPct':eff,'jobRows':jobs},indent=2))
  return {'month':mk,'snapshot':str(snapshot.relative_to(ROOT)),'summary':str(summary.relative_to(ROOT)),'jobs':len(jobs),'shifts':shifts}
 def save(s):
  s['updatedAt']=now(); tmp=DATA.with_suffix('.tmp'); tmp.write_text(json.dumps(s,indent=2)); tmp.replace(DATA)
@@ -67,6 +72,7 @@ def load():
  migrated=False
  for bucket in ('work','downtime','breaks'):
   s['presets'].setdefault(bucket,base['presets'][bucket])
+ s['presets'].setdefault('book',{})
  for item in base['presets']['downtime']:
   if item not in s['presets']['downtime']:
    s['presets']['downtime'].append(item); migrated=True
@@ -305,6 +311,14 @@ def mutate(s,p):
    close_task(active_task(j),at); close_wait(j,at); j.setdefault('waits',[]).append({'id':str(uuid.uuid4()),'label':label,'start':at,'end':None})
   else:
    t={'id':str(uuid.uuid4()),'label':label,'status':'running','segments':[{'id':str(uuid.uuid4()),'start':at,'end':None}]}; close_task(active_task(j),at); j.setdefault('tasks',[]).append(t)
+ elif a=='setBookRate':
+  label=(p.get('label') or '').strip()
+  if not label: return False,'No operation label'
+  try: hrs=float(p.get('hours'))
+  except (TypeError,ValueError): hrs=0
+  book=s['presets'].setdefault('book',{})
+  if hrs>0: book[label]=round(hrs,2)
+  else: book.pop(label,None)
  elif a=='archiveSnapshot':
   info=archive_snapshot(s); s['lastArchive']=info
  elif a=='addNote':
