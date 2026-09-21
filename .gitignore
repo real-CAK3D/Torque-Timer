@@ -1,7 +1,9 @@
 # Local runtime state
 data.json
 data.tmp
+data.prev.json
 *.corrupt-*.json
+backups/
 
 # Python/runtime clutter
 __pycache__/

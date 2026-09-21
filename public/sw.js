@@ -1,3 +1,3 @@
-self.addEventListener('install',e=>e.waitUntil(caches.open('torqueclock-v21').then(c=>c.addAll(['/','/index.html','/style.css','/app.js','/manifest.webmanifest','/icon.svg']))));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!=='torqueclock-v21').map(k=>caches.delete(k))))));
+self.addEventListener('install',e=>e.waitUntil(caches.open('torqueclock-v22').then(c=>c.addAll(['/','/index.html','/style.css','/app.js','/manifest.webmanifest','/icon.svg']))));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!=='torqueclock-v22').map(k=>caches.delete(k))))));
 self.addEventListener('fetch',e=>{if(e.request.url.includes('/api/'))return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});
