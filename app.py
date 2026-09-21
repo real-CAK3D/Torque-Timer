@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 ROOT=Path(__file__).resolve().parent; DATA=ROOT/'data.json'; ARCHIVE=ROOT/'archive'; PORT=int(os.environ.get('MECH_CLOCK_PORT','8787'))
 def now(): return datetime.now(timezone.utc).isoformat()
 def fresh():
- return {'version':2,'createdAt':now(),'updatedAt':now(),'activeShift':None,'days':{},'presets':{'work':['Oil change','Rotate tires','Brakes','Alignment','Change tires','Flat repair','Replace bulbs','Replace filters','Torque tires','Diagnostic','Road test','Inspection','Battery','Wipers','Mount/balance','TPMS','Cleanup'],'downtime':['Wait for part','Wait for RO/approval','Advisor/customer','Drink','Snack','Bathroom','Tool run','Bay cleanup','Parts counter','Lift/setup wait'],'breaks':['Lunch','Break']}}
+ return {'version':5,'createdAt':now(),'updatedAt':now(),'activeShift':None,'days':{},'schedule':{},'presets':{'work':['Oil change','Rotate tires','Brakes','Alignment','Change tires','Flat repair','Replace bulbs','Replace filters','Torque tires','Diagnostic','Road test','Inspection','Battery','Wipers','Mount/balance','TPMS','Cleanup'],'downtime':['Wait for part','Wait for RO/approval','Advisor/customer','Drink','Snack','Bathroom','Tool run','Bay cleanup','Parts counter','Lift/setup wait','Double Torque'],'breaks':['Lunch','Break']}}
 def day(): return datetime.now(timezone.utc).date().isoformat()
 
 def dur_ms(a,b):
@@ -44,9 +44,9 @@ def save(s):
  s['updatedAt']=now(); tmp=DATA.with_suffix('.tmp'); tmp.write_text(json.dumps(s,indent=2)); tmp.replace(DATA)
 def normalize_job(j):
  j.setdefault('tasks',[]); j.setdefault('waits',[]); j.setdefault('notes',[]); j.setdefault('segments',[]); j.setdefault('status','active' if j.get('end') is None else 'done')
- j.setdefault('make',''); j.setdefault('model',''); j.setdefault('year','');
+ j.setdefault('make',''); j.setdefault('model',''); j.setdefault('trim',''); j.setdefault('year','');
  if not j.get('vehicle'):
-  j['vehicle']=' '.join(str(x).strip() for x in [j.get('year'),j.get('make'),j.get('model')] if str(x).strip())
+  j['vehicle']=' '.join(str(x).strip() for x in [j.get('year'),j.get('make'),j.get('model'),j.get('trim')] if str(x).strip())
  if not j['tasks']:
   labels=[]
   for seg in j.get('segments',[]):
@@ -60,7 +60,17 @@ def load():
  try: s=json.loads(DATA.read_text())
  except Exception:
   bak=DATA.with_suffix('.corrupt-%d.json'%int(time.time())); DATA.rename(bak); s=fresh(); s['recoveredFrom']=bak.name; save(s)
- base=fresh(); s.setdefault('days',{}); s.setdefault('presets',base['presets']); s['presets'].setdefault('breaks',base['presets']['breaks']); s['version']=2
+ base=fresh(); s.setdefault('days',{}); s.setdefault('schedule',{}); s.setdefault('presets',base['presets']); s['presets'].setdefault('breaks',base['presets']['breaks']); s['version']=5
+ for k,rec in list(s.get('schedule',{}).items()):
+  if isinstance(rec,list): rec={'date':k,'status':'work','note':'','items':rec}; s['schedule'][k]=rec
+  rec.setdefault('date',k); rec.setdefault('status','work'); rec.setdefault('note',''); rec.setdefault('startTime','08:00'); rec.setdefault('endTime','17:00'); rec.setdefault('items',[])
+ migrated=False
+ for bucket in ('work','downtime','breaks'):
+  s['presets'].setdefault(bucket,base['presets'][bucket])
+ for item in base['presets']['downtime']:
+  if item not in s['presets']['downtime']:
+   s['presets']['downtime'].append(item); migrated=True
+ if migrated: save(s)
  for d in s['days'].values():
   for sh in d.get('shifts',[]):
    sh.setdefault('breaks',[]); sh.setdefault('lunches',[]); sh.setdefault('jobs',[]); sh.setdefault('notes',[])
@@ -76,6 +86,30 @@ def load():
  return s
 def today(s):
  k=day(); s['days'].setdefault(k,{'date':k,'shifts':[],'notes':[]}); return s['days'][k]
+def clean_date(v):
+ v=(v or day()).strip() if isinstance(v,str) else day()
+ try:
+  datetime.fromisoformat(v[:10]); return v[:10]
+ except Exception: return day()
+def clean_time(v,default=''):
+ v=(v or default or '').strip() if isinstance(v,str) else (default or '')
+ if not v: return ''
+ try:
+  datetime.strptime(v,'%H:%M'); return v
+ except Exception: return default or ''
+def today_schedule(s,date_value=None):
+ k=clean_date(date_value); s.setdefault('schedule',{}); s['schedule'].setdefault(k,{'date':k,'status':'work','note':'','startTime':'08:00','endTime':'17:00','items':[]}); return s['schedule'][k]
+def find_schedule_item(s,item_id):
+ for rec in s.get('schedule',{}).values():
+  for item in rec.get('items',[]):
+   if item.get('id')==item_id: return item
+ return None
+def mark_schedule_done(s,schedule_id,job_id=None):
+ item=find_schedule_item(s,schedule_id)
+ if item:
+  item['status']='done'; item['completedAt']=now()
+  if job_id: item['jobId']=job_id
+ return item
 def active_job(sh):
  if not sh: return None
  for j in reversed(sh.get('jobs',[])):
@@ -107,7 +141,7 @@ def resume_task(j,tid,at):
  if not t or t.get('status')=='done': return False
  close_wait(j,at); close_task(active_task(j),at); t['status']='running'; t.setdefault('segments',[]).append({'id':str(uuid.uuid4()),'start':at,'end':None}); return True
 def mutate(s,p):
- a=p.get('action'); at=now(); d=today(s); sh=s.get('activeShift')
+ a=p.get('action'); at=now(); d=today(s); sched=today_schedule(s,p.get('date')); sh=s.get('activeShift')
  if a=='startShift':
   if sh: return False,'Shift already running'
   sh={'id':str(uuid.uuid4()),'start':at,'end':None,'breaks':[],'lunches':[],'jobs':[],'notes':[],'label':p.get('label','Work shift')}; s['activeShift']=sh; d['shifts'].append(sh)
@@ -117,6 +151,7 @@ def mutate(s,p):
   for j in sh.get('jobs',[]):
    if j.get('end') is None:
     close_wait(j,at); close_task(active_task(j),at); j['end']=at; j['status']='done'
+    if j.get('scheduleId'): mark_schedule_done(s,j.get('scheduleId'),j.get('id'))
   sh['end']=at; s['activeShift']=None
  elif a in ('startLunch','startBreak'):
   if not sh: return False,'Start work first'
@@ -142,9 +177,50 @@ def mutate(s,p):
    old['resumeTaskId']=oldt.get('id') if oldt else old.get('resumeTaskId',''); old['status']='hold'; old['heldAt']=at
   title=(p.get('title') or '').strip() or 'Shop job'; items=[x.strip() for x in p.get('items',[]) if str(x).strip()]
   if not items: items=[title]
-  make=(p.get('make') or '').strip(); model=(p.get('model') or '').strip(); year=(p.get('year') or '').strip(); vehicle=(p.get('vehicle') or '').strip() or ' '.join(x for x in [year,make,model] if x)
+  make=(p.get('make') or '').strip(); model=(p.get('model') or '').strip(); trim=(p.get('trim') or '').strip(); year=(p.get('year') or '').strip(); vehicle=(p.get('vehicle') or '').strip() or ' '.join(x for x in [year,make,model,trim] if x)
   tasks=[{'id':str(uuid.uuid4()),'label':x,'status':'queued','segments':[]} for x in items]
-  j={'id':str(uuid.uuid4()),'vehicle':vehicle,'make':make,'model':model,'year':year,'ro':(p.get('ro') or '').strip(),'title':title,'start':at,'end':None,'status':'active','tasks':tasks,'waits':[],'segments':[],'notes':[]}; sh['jobs'].append(j)
+  j={'id':str(uuid.uuid4()),'vehicle':vehicle,'make':make,'model':model,'trim':trim,'year':year,'ro':(p.get('ro') or '').strip(),'title':title,'category':(p.get('category') or '').strip(),'scheduleId':(p.get('scheduleId') or '').strip(),'start':at,'end':None,'status':'active','tasks':tasks,'waits':[],'segments':[],'notes':[]}; sh['jobs'].append(j)
+  if j.get('scheduleId'):
+   item=find_schedule_item(s,j.get('scheduleId'))
+   if item: item['status']='active'; item['startedAt']=at; item['jobId']=j['id']
+ elif a=='setScheduleDay':
+  rec=today_schedule(s,p.get('date')); rec['status']=(p.get('status') or 'work').strip() or 'work'; rec['note']=(p.get('note') or '').strip(); rec['startTime']=clean_time(p.get('startTime'),rec.get('startTime','08:00')); rec['endTime']=clean_time(p.get('endTime'),rec.get('endTime','17:00'))
+ elif a=='addRecurringSchedule':
+  from datetime import timedelta
+  status=(p.get('status') or 'work').strip() or 'work'; note=(p.get('note') or '').strip(); start_time=clean_time(p.get('startTime'),'08:00'); end_time=clean_time(p.get('endTime'),'17:00'); weeks=max(1,min(104,int(p.get('weeks') or 26))); weekdays=set(int(x) for x in p.get('weekdays',[]) if str(x).isdigit())
+  start=datetime.fromisoformat(clean_date(p.get('startDate'))).date()
+  for i in range(weeks*7):
+   dd=start+timedelta(days=i)
+   if dd.weekday() in weekdays:
+    rec=today_schedule(s,dd.isoformat())
+    if rec.get('status') not in ('holiday','vacation','time off'):
+     rec['status']=status; rec['note']=note; rec['startTime']=start_time; rec['endTime']=end_time
+ elif a=='addScheduledWorkOrder':
+  items=[x.strip() for x in p.get('items',[]) if str(x).strip()]
+  title=(p.get('title') or '').strip() or (items[0] if items else 'Shop job')
+  if not items: items=[title]
+  category=(p.get('category') or 'General Service').strip() or 'General Service'
+  make=(p.get('make') or '').strip(); model=(p.get('model') or '').strip(); trim=(p.get('trim') or '').strip(); year=(p.get('year') or '').strip(); vehicle=(p.get('vehicle') or '').strip() or ' '.join(x for x in [year,make,model,trim] if x) or 'Vehicle TBD'
+  item={'id':str(uuid.uuid4()),'date':clean_date(p.get('date')),'category':category,'vehicle':vehicle,'year':year,'make':make,'model':model,'trim':trim,'ro':(p.get('ro') or '').strip(),'title':title,'items':items,'notes':(p.get('notes') or '').strip(),'status':'queued','createdAt':at}
+  sched.setdefault('items',[]).append(item)
+ elif a=='deleteScheduledWorkOrder':
+  item_id=p.get('itemId'); removed=False
+  for rec in s.get('schedule',{}).values():
+   before=len(rec.get('items',[])); rec['items']=[x for x in rec.get('items',[]) if x.get('id')!=item_id]; removed=removed or len(rec['items'])!=before
+  if not removed: return False,'Scheduled W/O not found'
+ elif a=='startScheduledWorkOrder':
+  if not sh: return False,'Start work first'
+  item=find_schedule_item(s,p.get('itemId'))
+  if not item: return False,'Scheduled W/O not found'
+  if item.get('status')=='done': return False,'Scheduled W/O already finished'
+  old=active_job(sh); oldt=active_task(old); close_wait(old,at); close_task(oldt,at)
+  if old:
+   if len(held_jobs(sh))>=3: return False,'Hold/finish one of the 3 parked vehicles first'
+   old['resumeTaskId']=oldt.get('id') if oldt else old.get('resumeTaskId',''); old['status']='hold'; old['heldAt']=at
+  items=[x.strip() for x in item.get('items',[]) if str(x).strip()] or [item.get('title') or 'Shop job']
+  tasks=[{'id':str(uuid.uuid4()),'label':x,'status':'queued','segments':[]} for x in items]
+  j={'id':str(uuid.uuid4()),'vehicle':item.get('vehicle') or 'Vehicle','make':item.get('make',''),'model':item.get('model',''),'trim':item.get('trim',''),'year':item.get('year',''),'ro':item.get('ro',''),'title':item.get('title') or 'Shop job','category':item.get('category',''),'scheduleId':item.get('id'),'start':at,'end':None,'status':'active','tasks':tasks,'waits':[],'segments':[],'notes':[]}
+  sh['jobs'].append(j); item['status']='active'; item['startedAt']=at; item['jobId']=j['id']
  elif a=='holdJob':
   if not sh: return False,'Start work first'
   j=active_job(sh)
@@ -162,6 +238,7 @@ def mutate(s,p):
   j=active_job(sh)
   if not j: return False,'No active job'
   close_wait(j,at); close_task(active_task(j),at); j['end']=at; j['status']='done'
+  if j.get('scheduleId'): mark_schedule_done(s,j.get('scheduleId'),j.get('id'))
  elif a=='startTask':
   j=active_job(sh); t=find_task(j,p.get('taskId'))
   if not t: return False,'Pick a job item first'
@@ -198,6 +275,24 @@ def mutate(s,p):
    if x: x['jobs']=[j for j in x.get('jobs',[]) if j.get('id')!=jid]
   after=sum(len(x.get('jobs',[])) for x in pools if x)
   if after==before: return False,'Vehicle/job not found'
+ elif a=='editShift':
+  sid=p.get('shiftId'); target=None
+  for dd in s.get('days',{}).values():
+   for x in dd.get('shifts',[]):
+    if x.get('id')==sid: target=x
+  if not target: return False,'Clock record not found'
+  start=(p.get('start') or '').strip(); end=(p.get('end') or '').strip()
+  if start: target['start']=start
+  target['end']=end or None
+  if s.get('activeShift') and s['activeShift'].get('id')==sid:
+   s['activeShift']=target if target.get('end') is None else None
+  target['status']='active' if target.get('end') is None else 'done'
+ elif a=='deleteShift':
+  sid=p.get('shiftId'); removed=False
+  for dd in s.get('days',{}).values():
+   before=len(dd.get('shifts',[])); dd['shifts']=[x for x in dd.get('shifts',[]) if x.get('id')!=sid]; removed=removed or len(dd.get('shifts',[]))!=before
+  if s.get('activeShift') and s['activeShift'].get('id')==sid: s['activeShift']=None
+  if not removed: return False,'Clock record not found'
  elif a=='endWait':
   j=active_job(sh)
   if not j or not j.get('waits') or j['waits'][-1].get('end') is not None: return False,'No wait running'
