@@ -8,21 +8,30 @@ optional webhook fires when someone arrives or leaves.
 
 ## Wiring
 
-The cable has a small **1.25 mm plug** on one end and **2.54 mm Dupont sockets** on the other.
+Works with the **LD2410**, **LD2410B**, and **LD2410C**. They all use the same serial protocol.
 
-- The small plug goes into the radar's 5-pin socket. It's keyed, so it only fits one way. Don't force it.
-- The Dupont ends go onto the ESP32's header pins as shown below.
+**Which connector to use:**
+- **Radar with 5 male header pins** (for example LD2410B V1.3): use **5 female-to-female Dupont
+  jumpers** straight from the radar pins to the ESP32 pins. The 1.25 mm plug on the included cable
+  doesn't fit an ESP32 DevKit.
+- **Radar with a tiny 5-pin socket** (original LD2410): the cable's small 1.25 mm plug goes into the
+  radar. It's keyed, so it only fits one way.
 
-**Read the labels printed on the radar board next to each pin.** Cable wire colors aren't
-standard, so follow each wire from its pin on the radar to its Dupont end.
+**LD2410B pin order:** pin **1** is marked with a small "1" next to it on the board.
+
+| Pin | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|
+| Signal | OUT | TX | RX | GND | VCC (5 V) |
+
+Wire colors aren't standard. Go by pin position or the labels printed on the board, never by color.
 
 | LD2410 pin (silkscreen) | ESP32 DevKit pin | Notes |
 |---|---|---|
-| **VCC** | **VIN** (also labeled **5V**) | Needs **5 V**. 3.3 V gives unreliable readings. |
+| **VCC** | **VIN** (on some boards labeled **5V**) | Needs **5 V**. 3.3 V gives unreliable readings. |
 | **GND** | **GND** | |
-| **TX** (UART_Tx) | **GPIO16** (RX2) | TX always goes to RX |
-| **RX** (UART_Rx) | **GPIO17** (TX2) | RX always goes to TX |
-| **OUT** | **GPIO4** | Optional. High while a person is detected. |
+| **TX** (UART_Tx) | **RX2** (GPIO16) | TX always goes to RX |
+| **RX** (UART_Rx) | **TX2** (GPIO17) | RX always goes to TX |
+| **OUT** | **D4** (GPIO4) | Optional. High while a person is detected. |
 
 ```
    LD2410                ESP32 DevKit
