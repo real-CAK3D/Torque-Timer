@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- radar rings -->
+    <path android:strokeColor="#3300E5A0" android:strokeWidth="1.5" android:fillColor="#00000000"
+        android:pathData="M54,22a32,32 0 1,0 0.01,0z" />
+    <!-- antenna -->
+    <path android:strokeColor="#FF7CF5C8" android:strokeWidth="2.5" android:strokeLineCap="round"
+        android:fillColor="#00000000" android:pathData="M54,40 Q52,32 58,27" />
+    <path android:fillColor="#FFFFD54F" android:pathData="M58,27m-4,0a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" />
+    <!-- body -->
+    <path android:fillColor="#FF2EE6A6"
+        android:pathData="M54,38 C70,38 78,50 78,62 C78,74 68,80 54,80 C40,80 30,74 30,62 C30,50 38,38 54,38 Z" />
+    <!-- belly -->
+    <path android:fillColor="#FF9CF7D6"
+        android:pathData="M54,58 C63,58 67,64 67,69 C67,75 61,78 54,78 C47,78 41,75 41,69 C41,64 45,58 54,58 Z" />
+    <!-- eyes -->
+    <path android:fillColor="#FF0B1220" android:pathData="M46,55m-4.5,0a4.5,5.5 0 1,0 9,0a4.5,5.5 0 1,0 -9,0" />
+    <path android:fillColor="#FF0B1220" android:pathData="M62,55m-4.5,0a4.5,5.5 0 1,0 9,0a4.5,5.5 0 1,0 -9,0" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M47.5,53m-1.6,0a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M63.5,53m-1.6,0a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0" />
+    <!-- smile -->
+    <path android:strokeColor="#FF0B1220" android:strokeWidth="2" android:strokeLineCap="round"
+        android:fillColor="#00000000" android:pathData="M50,64 Q54,68 58,64" />
+    <!-- barcode belly -->
+    <path android:fillColor="#552E7D6A" android:pathData="M48,70h1.5v5h-1.5z M51,70h0.8v5h-0.8z M53,70h2v5h-2z M56.5,70h0.8v5h-0.8z M58.5,70h1.5v5h-1.5z" />
+</vector>
