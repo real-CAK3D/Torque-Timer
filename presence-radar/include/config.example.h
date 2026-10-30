@@ -13,7 +13,7 @@
 // ---- Wiring (ESP32 DevKit, UART2) -----------------------------------------
 #define RADAR_RX_PIN 16  // ESP32 RX2  <- radar TX
 #define RADAR_TX_PIN 17  // ESP32 TX2  -> radar RX
-#define RADAR_OUT_PIN 4  // radar OUT (optional, digital presence line); -1 to disable
+#define RADAR_OUT_PIN 18 // radar OUT (optional, digital presence line); -1 to disable
 #define STATUS_LED_PIN 2 // on-board blue LED lights while someone is present; -1 to disable
 
 // ---- Detection tuning -----------------------------------------------------

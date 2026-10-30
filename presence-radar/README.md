@@ -8,6 +8,8 @@ optional webhook fires when someone arrives or leaves.
 
 ## Wiring
 
+![Wiring diagram](docs/wiring.png)
+
 Works with the **LD2410**, **LD2410B**, and **LD2410C**. They all use the same serial protocol.
 
 **Which connector to use:**
@@ -31,7 +33,7 @@ Wire colors aren't standard. Go by pin position or the labels printed on the boa
 | **GND** | **GND** | |
 | **TX** (UART_Tx) | **RX2** (GPIO16) | TX always goes to RX |
 | **RX** (UART_Rx) | **TX2** (GPIO17) | RX always goes to TX |
-| **OUT** | **D4** (GPIO4) | Optional. High while a person is detected. |
+| **OUT** | **D18** (GPIO18) | Optional. High while a person is detected. |
 
 ```
    LD2410                ESP32 DevKit
@@ -40,7 +42,7 @@ Wire colors aren't standard. Go by pin position or the labels printed on the boa
   │ GND  ──┼────────────┼── GND        │
   │ TX   ──┼────────────┼── GPIO16 RX2 │
   │ RX   ──┼────────────┼── GPIO17 TX2 │
-  │ OUT  ──┼────────────┼── GPIO4      │
+  │ OUT  ──┼────────────┼── GPIO18     │
   └────────┘            └──────────────┘
 ```
 
