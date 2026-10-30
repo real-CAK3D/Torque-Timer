@@ -84,12 +84,14 @@ Rollback/stop: `systemctl --user stop torqueclock.service` or restore from a bac
 A 90s-style CRT TV that channel-surfs archive.org and YouTube, at `http://<host>:8800/tv.html`
 (it's a single self-contained page, so you can also open `public/tv.html` straight in a browser).
 
-- Channels 2–24 are archive.org collections (classic TV, cartoons, feature films, noir, Prelinger,
-  commercials, Computer Chronicles, live concerts, 78s, old-time radio…). Channels 30–35 are YouTube
-  channels (Adult Swim, Cartoon Network, WB Kids/Looney Tunes, Mr Bean, PBS Kids, CN Asia), played
-  from each channel's uploads playlist. Channel 50 surfs all of archive.org, and channel 99 is your own search.
+- About 110 channels with their own station names, grouped in the guide: Cartoons (2–12), Comedy (14–25, incl.
+  Stooge-O-Rama, Laurel & Hardy, Little Rascals), Drama & classic TV (27–37), Movies (40–59, incl. Black & White
+  Theater, Drive-In, Kung Fu Theater), Horror & Seasonal (60–69; ch 67 changes theme every month), Music (70–85, incl.
+  VJ-TV music videos, oldies, jazz, 78s), Learning (86–92), Ads & TV junk (93–99), News/Sports/Lifestyle (100–110),
+  YouTube (120–125: Adult Swim, Cartoon Network, WB Kids/Looney Tunes, Mr Bean, PBS Kids, CN Asia) and your own
+  search channel (199). archive.org channels are saved searches, so they fill themselves from whatever is there.
 - Every channel runs a daily schedule of 30-minute slots, so tuning in drops you into whatever is already on.
   GUIDE shows the grid in the old Prevue style.
-- ★ SEARCH on the remote programs channel 99, and can add any other YouTube channel (by `/channel/UC…`
-  or playlist link) as channels 40+. These are saved in the browser.
-- Keys: ↑/↓ channel, ←/→ volume, 0–9 direct tune, G guide, I info, M mute, L last channel, S search, P power.
+- ★ SEARCH on the remote programs channel 199, and can add any other YouTube channel (by `/channel/UC…`
+  or playlist link) as channels 200+. These are saved in the browser.
+- Keys: ↑/↓ channel, ←/→ volume, 0–9 direct tune (up to 3 digits), G guide, I info, M mute, L last channel, S search, P power.

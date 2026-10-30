@@ -105,6 +105,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .g-row.sel .g-ch em,.g-row.sel .g-ch span{color:#111}
 .g-row.tuned .g-ch{box-shadow:inset .6cqw 0 0 #63ff6e}
 .g-cell.dim{color:#8ea0d8}
+.g-cat{background:#c4161c;color:#fff;font-weight:700;font-size:2cqw;letter-spacing:.2em;padding:.3cqw 1cqw;border-bottom:.2cqw solid #7a0d11}
 .g-row.sel .g-cell.dim{color:#5a4a00}
 
 /* ---------- on-screen display ---------- */
@@ -243,10 +244,10 @@ button{font:inherit;color:inherit;cursor:pointer}
             <div id="info"></div>
             <div id="msg"></div>
             <form id="tuner" autocomplete="off">
-              <h3>★ PROGRAM CHANNEL 99</h3>
+              <h3>★ PROGRAM CHANNEL 199</h3>
               <p>Type anything to search all of archive.org. Try <i>godzilla</i>, <i>lucy</i>, <i>grateful dead</i>, <i>betty boop</i>.</p>
               <div class="row"><input id="tunerQ" placeholder="search archive.org…"><button type="submit">TUNE</button></div>
-              <p>Or add a YouTube channel: paste its <i>youtube.com/channel/UC…</i> link, a playlist link, or a video link.</p>
+              <p>Or add a YouTube channel (it becomes CH 200+): paste its <i>youtube.com/channel/UC…</i> link, a playlist link, or a video link.</p>
               <div class="row"><input id="tunerYT" placeholder="https://www.youtube.com/channel/UC…"><input id="tunerYTName" placeholder="name" style="flex:.5"><button type="button" class="alt" id="tunerYTAdd">ADD</button></div>
               <div class="yt-list" id="ytList"></div>
               <div class="row"><button type="button" class="alt" id="tunerClose">CLOSE</button></div>
@@ -289,7 +290,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div class="rbrand">ArchiVision</div>
   </div>
 </div>
-<p class="hint">Press <kbd>P</kbd> or POWER to turn it on · <kbd>↑</kbd><kbd>↓</kbd> channels · <kbd>←</kbd><kbd>→</kbd> volume · <kbd>0</kbd>–<kbd>9</kbd> punch in a channel · <kbd>G</kbd> guide · <kbd>I</kbd> info · <kbd>M</kbd> mute · <kbd>L</kbd> last · <kbd>S</kbd> search · swipe the screen on phones.<br>Everything plays live from archive.org and YouTube. Each channel runs a schedule of half-hour slots, so tuning in drops you into whatever's already on.</p>
+<p class="hint">Press <kbd>P</kbd> or POWER to turn it on · <kbd>↑</kbd><kbd>↓</kbd> channels · <kbd>←</kbd><kbd>→</kbd> volume · <kbd>0</kbd>–<kbd>9</kbd> punch in a channel (up to 3 digits) · <kbd>G</kbd> guide · <kbd>I</kbd> info · <kbd>M</kbd> mute · <kbd>L</kbd> last · <kbd>S</kbd> search · swipe the screen on phones.<br>Everything plays live from archive.org and YouTube. Each channel runs a schedule of half-hour slots, so tuning in drops you into whatever's already on.</p>
 
 <script>
 'use strict';
@@ -298,37 +299,151 @@ const API='https://archive.org';
 const SLOT=30*60*1000;
 
 /* ---------- channel lineup ---------- */
-// archive.org channels: q is tried in order until one returns items.
+// archive.org channels: q is a list of searches tried in order until one returns items.
 // YouTube channels: yt is a list of candidate channel IDs (UC…) or playlist IDs, tried in order.
+const words=ws=>ws.map(w=>`"${w}"`).join(' OR ');
+const T=(...ws)=>`title:(${words(ws)})`;
+const S=(...ws)=>`subject:(${words(ws)})`;
+const TS=(...ws)=>`(${T(...ws)} OR ${S(...ws)})`;
+const ADS='subject:(commercial OR commercials OR advertisement OR advertising)';
+const SEASONS=[
+  ['New Year’s',TS('new year','new years eve','winter')],
+  ['Valentine’s',TS('valentine','sweetheart','love story')],
+  ['St. Patrick’s',TS('st. patrick','saint patrick','irish','ireland')],
+  ['Springtime',TS('easter','spring','easter bunny')],
+  ['Mother’s Day',TS('mother','mothers day','spring')],
+  ['Summer Fun',TS('summer','beach','beach party','vacation')],
+  ['Fourth of July',TS('fourth of july','independence day','fireworks','america')],
+  ['Summer Camp',TS('summer camp','camp','beach','surfing')],
+  ['Back to School',TS('back to school','school','classroom')],
+  ['Halloween',TS('halloween','trick or treat','haunted','ghost')],
+  ['Thanksgiving',TS('thanksgiving','turkey','pilgrims','harvest')],
+  ['Christmas',TS('christmas','santa claus','xmas','holiday')],
+];
+const season=()=>SEASONS[new Date().getMonth()];
 const BASE_CHANNELS=[
-  {n:2, call:'CLSC', name:'Classic TV',            q:['collection:classic_tv']},
-  {n:3, call:'TOON', name:'Saturday Cartoons',     q:['collection:classic_cartoons']},
-  {n:4, call:'FLIX', name:'Feature Films',         q:['collection:feature_films']},
-  {n:5, call:'FEAR', name:'Sci-Fi & Horror',       q:['collection:SciFi_Horror']},
-  {n:6, call:'NOIR', name:'Film Noir',             q:['collection:Film_Noir']},
-  {n:7, call:'SLNT', name:'Silent Picture Show',   q:['collection:silent_films']},
-  {n:8, call:'PREL', name:'Prelinger Archives',    q:['collection:prelinger']},
-  {n:9, call:'NEWS', name:'News & Public Affairs', q:['collection:newsandpublicaffairs']},
-  {n:10,call:'ADS',  name:'Vintage Commercials',   q:['collection:classic_tv_commercials','subject:commercials']},
-  {n:11,call:'ANIM', name:'Animation Station',     q:['collection:animationandcartoons']},
-  {n:12,call:'TECH', name:'Computer Chronicles',   q:['collection:computerchronicles']},
-  {n:13,call:'GAME', name:'Game Videos',           q:['collection:gamevideos']},
-  {n:14,call:'DOCS', name:'Documentaries',         q:['subject:documentary']},
-  {n:15,call:'TRLR', name:'Coming Attractions',    q:['collection:movie_trailers','subject:trailer']},
-  {n:16,call:'EPHM', name:'Ephemeral Films',       q:['collection:ephemera']},
-  {n:20,call:'MUSC', name:'Music Videos',          q:['subject:"music video"']},
-  {n:21,call:'LIVE', name:'Live Concerts',         q:['collection:etree'], audio:true},
-  {n:22,call:'78RPM',name:'Great 78 Project',      q:['collection:georgeblood'], audio:true},
-  {n:23,call:'OTR',  name:'Old Time Radio',        q:['collection:oldtimeradio'], audio:true},
-  {n:24,call:'NETL', name:'Netlabel Music',        q:['collection:netlabels'], audio:true},
-  {n:30,call:'[AS]', name:'Adult Swim',            yt:['UCgPClNr5VSYC3syrDUIlzLw']},
-  {n:31,call:'CN',   name:'Cartoon Network',       yt:['UCMsgXPD3wzzt8RxHJmXH7hQ','UCXoZJ2AaqhF8SF0Fgt2RYIw']},
-  {n:32,call:'WBK',  name:'Looney Tunes · WB Kids',yt:['UC9trsD1jCTXXtN3xIOIU8gg']},
-  {n:33,call:'BEAN', name:'Mr Bean',               yt:['UCkAGrHCLFmlK3H2kd6isipg']},
-  {n:34,call:'PBSK', name:'PBS Kids',              yt:['UCmNIdCsMr-kjBzpzFH14cZg']},
-  {n:35,call:'CNAS', name:'Cartoon Network Asia',  yt:['UC9hVEGaTpAYMVd-bRsOYKwA']},
-  {n:50,call:'SURF', name:'Anything on Archive',   q:['downloads:[5000 TO *]'], rows:400},
-  {n:99,call:'MYCH', name:'Your Channel',          custom:true},
+  // ---- cartoons
+  {n:2,  cat:'CARTOONS', call:'TOON', name:'Toon Town',              q:['collection:classic_cartoons']},
+  {n:3,  cat:'CARTOONS', call:'LOON', name:'Looney Lane',            q:[TS('looney tunes','merrie melodies','bugs bunny','daffy duck','porky pig')]},
+  {n:4,  cat:'CARTOONS', call:'FLSH', name:'Fleischer Flicks',       q:[TS('betty boop','popeye','fleischer')]},
+  {n:5,  cat:'CARTOONS', call:'FELX', name:'Felix & Friends',        q:[TS('felix the cat','mighty mouse','woody woodpecker','casper','heckle and jeckle')]},
+  {n:6,  cat:'CARTOONS', call:'SUPR', name:'Super Toons',            q:[TS('superman','batman','spider-man','space ghost')+' AND subject:(cartoon OR cartoons OR animation)',TS('superman','space ghost')]},
+  {n:7,  cat:'CARTOONS', call:'SATM', name:'Saturday Morning',       q:['subject:(cartoon OR cartoons OR animation) AND year:[1960 TO 1989]']},
+  {n:8,  cat:'CARTOONS', call:'NTUN', name:'New Toons',              q:['subject:(animation OR animated OR cartoon) AND year:[2005 TO 2030]']},
+  {n:9,  cat:'CARTOONS', call:'ANIM', name:'Animation Station',      q:['collection:animationandcartoons']},
+  {n:10, cat:'CARTOONS', call:'ANME', name:'Anime Express',          q:['subject:(anime OR "japanese animation")']},
+  {n:11, cat:'CARTOONS', call:'CLAY', name:'Stop-Motion Theater',    q:[S('stop motion','stop-motion','claymation','puppet animation')]},
+  {n:12, cat:'CARTOONS', call:'KIDS', name:'Kid Vid',                q:[S("children's television","children's programming",'kids tv'),'subject:children']},
+  // ---- comedy
+  {n:14, cat:'COMEDY',   call:'STGE', name:'Stooge-O-Rama',          q:[TS('three stooges','3 stooges')]},
+  {n:15, cat:'COMEDY',   call:'LAFF', name:'Laff Track Sitcoms',     q:['collection:classic_tv AND subject:(sitcom OR comedy)']},
+  {n:16, cat:'COMEDY',   call:'CHKL', name:'Chuckle Cinema',         q:['collection:feature_films AND subject:comedy']},
+  {n:17, cat:'COMEDY',   call:'SLAP', name:'Slapstick Silents',      q:['collection:silent_films AND subject:comedy',TS('charlie chaplin','buster keaton','harold lloyd')]},
+  {n:18, cat:'COMEDY',   call:'L&H',  name:'Laurel & Hardy',         q:[TS('laurel and hardy','laurel & hardy')]},
+  {n:19, cat:'COMEDY',   call:'RASC', name:'Rascals Clubhouse',      q:[TS('little rascals','our gang')]},
+  {n:20, cat:'COMEDY',   call:'A&C',  name:'Abbott & Costello',      q:[TS('abbott and costello','abbott & costello')]},
+  {n:21, cat:'COMEDY',   call:'LUCY', name:'Lucy & Desi',            q:[TS('i love lucy','lucy show','lucille ball')]},
+  {n:22, cat:'COMEDY',   call:'MARX', name:'Marx Bros. Madness',     q:[TS('marx brothers','groucho marx')]},
+  {n:23, cat:'COMEDY',   call:'STND', name:'Stand-Up Stage',         q:[S('stand-up comedy','stand up comedy','standup','comedian')]},
+  {n:24, cat:'COMEDY',   call:'SKIT', name:'Sketch Show',            q:[S('sketch comedy','variety show','sketch')]},
+  {n:25, cat:'COMEDY',   call:'RLAF', name:'Radio Laughs',           q:['collection:oldtimeradio AND subject:comedy','collection:oldtimeradio AND '+TS('jack benny','fibber mcgee','burns and allen','abbott and costello')],audio:true},
+  // ---- drama & classic TV
+  {n:27, cat:'DRAMA',    call:'CLSC', name:'Classic TV',             q:['collection:classic_tv']},
+  {n:28, cat:'DRAMA',    call:'PLAY', name:'Playhouse Drama',        q:['collection:classic_tv AND subject:drama','subject:drama AND subject:television']},
+  {n:29, cat:'DRAMA',    call:'TRAL', name:'Dusty Trail Westerns',   q:[S('western','westerns','cowboy')]},
+  {n:30, cat:'DRAMA',    call:'COPS', name:'Crime Beat',             q:['collection:classic_tv AND subject:(crime OR detective OR police)',S('detective','crime drama','police')]},
+  {n:31, cat:'DRAMA',    call:'ZONE', name:'Strange Signals',        q:['collection:classic_tv AND subject:("science fiction" OR "sci-fi" OR fantasy OR "twilight zone")']},
+  {n:32, cat:'DRAMA',    call:'SOAP', name:'Soap Box',               q:[S('soap opera','soap operas','soaps')]},
+  {n:33, cat:'DRAMA',    call:'SPY',  name:'Spy Network',            q:[S('spy','espionage','secret agent')]},
+  {n:34, cat:'DRAMA',    call:'ADVN', name:'Adventure Hour',         q:['collection:classic_tv AND subject:adventure','subject:adventure']},
+  {n:35, cat:'DRAMA',    call:'SRAL', name:'Cliffhanger Serials',    q:[S('serial','serials','movie serial','cliffhanger')]},
+  {n:36, cat:'DRAMA',    call:'MYST', name:'Mystery Theater',        q:['collection:oldtimeradio AND subject:(mystery OR detective)','collection:oldtimeradio AND '+TS('the shadow','sherlock holmes','dragnet')],audio:true},
+  {n:37, cat:'DRAMA',    call:'HIST', name:'Time Machine',           q:[S('history','historical')]},
+  // ---- movies
+  {n:40, cat:'MOVIES',   call:'FLIX', name:'Feature Presentation',   q:['collection:feature_films']},
+  {n:41, cat:'MOVIES',   call:'B&W',  name:'Black & White Theater',  q:['collection:feature_films AND year:[1920 TO 1959]']},
+  {n:42, cat:'MOVIES',   call:'NOIR', name:'Noir After Dark',        q:['collection:Film_Noir',S('film noir','noir')]},
+  {n:43, cat:'MOVIES',   call:'SLNT', name:'Silent Screen',          q:['collection:silent_films']},
+  {n:44, cat:'MOVIES',   call:'DRIV', name:'Drive-In',               q:[S('b-movie','b movie','drive-in','exploitation','grindhouse')]},
+  {n:45, cat:'MOVIES',   call:'KUNG', name:'Kung Fu Theater',        q:[S('martial arts','kung fu','karate')]},
+  {n:46, cat:'MOVIES',   call:'WAR',  name:'War Pictures',           q:['collection:feature_films AND subject:war',S('war film','world war ii')]},
+  {n:47, cat:'MOVIES',   call:'LOVE', name:'Romance Reel',           q:['collection:feature_films AND subject:romance',S('romance','romantic comedy')]},
+  {n:48, cat:'MOVIES',   call:'SONG', name:'Musical Matinee',        q:['collection:feature_films AND subject:(musical OR musicals)',S('musical','musicals')]},
+  {n:49, cat:'MOVIES',   call:'SUSP', name:'Suspense Theater',       q:[TS('hitchcock','suspense','thriller')]},
+  {n:50, cat:'MOVIES',   call:'SURF', name:'Anything on Archive',    q:['downloads:[5000 TO *]'], rows:400},
+  {n:51, cat:'MOVIES',   call:'FAML', name:'Family Film Fest',       q:['collection:feature_films AND subject:family',S('family film','family')]},
+  {n:52, cat:'MOVIES',   call:'WRLD', name:'World Cinema',           q:[S('foreign film','world cinema','foreign language film')]},
+  {n:53, cat:'MOVIES',   call:'KAIJ', name:'Monster Island',         q:[TS('godzilla','gamera','kaiju','giant monster')]},
+  {n:54, cat:'MOVIES',   call:'SCFI', name:'Sci-Fi Theater',         q:['collection:SciFi_Horror AND subject:("science fiction" OR sci-fi)','collection:SciFi_Horror']},
+  {n:55, cat:'MOVIES',   call:'TRLR', name:'Trailer Park',           q:['collection:movie_trailers',S('trailer','trailers','movie trailer')]},
+  {n:56, cat:'MOVIES',   call:'CULT', name:'Cult Classics',          q:[S('cult film','cult classic','cult')]},
+  {n:57, cat:'MOVIES',   call:'SHRT', name:'Short Subjects',         q:[S('short film','short films','shorts')]},
+  {n:58, cat:'MOVIES',   call:'STAR', name:'Golden Age Stars',       q:[TS('cary grant','john wayne','humphrey bogart','bette davis','james stewart','orson welles')]},
+  {n:59, cat:'MOVIES',   call:'INDI', name:'Indie Film Fest',        q:['subject:(independent OR "independent film" OR indie) AND year:[1990 TO 2030]']},
+  // ---- horror & seasonal
+  {n:60, cat:'HORROR',   call:'FRGT', name:'Fright Night',           q:['subject:horror']},
+  {n:61, cat:'HORROR',   call:'CHLR', name:'Chiller Theater',        q:[TS('vincent price','bela lugosi','boris karloff','lon chaney')]},
+  {n:62, cat:'HORROR',   call:'CRTR', name:'Creature Feature',       q:[S('monster','monsters','creature','creature feature')]},
+  {n:63, cat:'HORROR',   call:'ZMBI', name:'Zombie Zone',            q:[TS('zombie','zombies','night of the living dead')]},
+  {n:64, cat:'HORROR',   call:'FEAR', name:'Sci-Fi & Horror',        q:['collection:SciFi_Horror']},
+  {n:65, cat:'HORROR',   call:'SPKR', name:'Spooky Radio',           q:['collection:oldtimeradio AND '+TS('suspense','inner sanctum','lights out','quiet please','the hermit','horror')],audio:true},
+  {n:66, cat:'HORROR',   call:'HOST', name:'Horror Hosts',           q:[TS('horror host','elvira','vampira','svengoolie','shock theater')]},
+  {n:67, cat:'SEASONAL', call:'HOLI', get name(){return season()[0]+' Channel'}, get q(){return[season()[1]]}},
+  {n:68, cat:'SEASONAL', call:'XMAS', name:'Yule Channel',           q:[TS('christmas','santa claus','xmas')]},
+  {n:69, cat:'SEASONAL', call:'BOO',  name:'Halloween HQ',           q:[TS('halloween','trick or treat','haunted house')]},
+  // ---- music
+  {n:70, cat:'MUSIC',    call:'VJTV', name:'VJ-TV',                  q:['subject:("music video" OR "music videos") AND year:[1980 TO 1999]','subject:"music video"']},
+  {n:71, cat:'MUSIC',    call:'CLIP', name:'Video Jukebox',          q:[S('music video','music videos')]},
+  {n:72, cat:'MUSIC',    call:'SNDY', name:'Soundies',               q:[TS('soundie','soundies','scopitone')]},
+  {n:73, cat:'MUSIC',    call:'LIVE', name:'Live Concert Radio',     q:['collection:etree'], audio:true},
+  {n:74, cat:'MUSIC',    call:'CNCT', name:'Concert Hall',           q:[S('concert','live performance','live music')]},
+  {n:75, cat:'MUSIC',    call:'78RP', name:'Jukebox 78',             q:['collection:georgeblood'], audio:true},
+  {n:76, cat:'MUSIC',    call:'OLDS', name:'Oldies Radio',           q:[S('rock and roll','doo-wop','doo wop','rhythm and blues','rockabilly')], audio:true},
+  {n:77, cat:'MUSIC',    call:'JAZZ', name:'Jazz Club',              q:['subject:jazz'], audio:true},
+  {n:78, cat:'MUSIC',    call:'CNTY', name:'Country Roads',          q:[S('country','bluegrass','hillbilly','western swing')], audio:true},
+  {n:79, cat:'MUSIC',    call:'SWNG', name:'Big Band Ballroom',      q:[S('big band','swing','dance band','dance orchestra')], audio:true},
+  {n:80, cat:'MUSIC',    call:'CLSL', name:'Classical Concert',      q:['subject:classical'], audio:true},
+  {n:81, cat:'MUSIC',    call:'BLUS', name:'Blues Shack',            q:['subject:blues'], audio:true},
+  {n:82, cat:'MUSIC',    call:'CHIP', name:'Chiptune Arcade',        q:[S('chiptune','8bit','8-bit','chipmusic')], audio:true},
+  {n:83, cat:'MUSIC',    call:'NETL', name:'Netlabel Music',         q:['collection:netlabels'], audio:true},
+  {n:84, cat:'MUSIC',    call:'OTR',  name:'Old Time Radio',         q:['collection:oldtimeradio'], audio:true},
+  {n:85, cat:'MUSIC',    call:'MALL', name:'Mall Music',             q:[S('vaporwave','muzak','elevator music','easy listening','lounge')], audio:true},
+  // ---- learning
+  {n:86, cat:'LEARNING', call:'SCHL', name:'Schoolhouse Films',      q:['collection:prelinger AND subject:(educational OR "educational film")',S('educational film','educational')]},
+  {n:87, cat:'LEARNING', call:'MENT', name:'Mental Hygiene',         q:[S('social guidance','mental hygiene','etiquette')]},
+  {n:88, cat:'LEARNING', call:'DUCK', name:'Duck & Cover',           q:[S('civil defense','atomic bomb','cold war','nuclear')]},
+  {n:89, cat:'LEARNING', call:'NASA', name:'Space Race',             q:['collection:nasa',S('nasa','space','apollo')]},
+  {n:90, cat:'LEARNING', call:'WILD', name:'Nature Nook',            q:[S('nature','wildlife','animals')]},
+  {n:91, cat:'LEARNING', call:'TECH', name:'Computer Chronicles',    q:['collection:computerchronicles']},
+  {n:92, cat:'LEARNING', call:'GAME', name:'Game Videos',            q:['collection:gamevideos']},
+  // ---- commercials & TV junk
+  {n:93, cat:'ADS & TV', call:'ADS',  name:'Ad Break',               q:['collection:classic_tv_commercials',ADS]},
+  {n:94, cat:'ADS & TV', call:'TOYZ', name:'Toy & Cereal Ads',       q:[ADS+' AND '+TS('toy','toys','cereal','barbie','g.i. joe','hot wheels')]},
+  {n:95, cat:'ADS & TV', call:'PSA',  name:'PSA Network',            q:[S('public service announcement','public service announcements','psa')]},
+  {n:96, cat:'ADS & TV', call:'BUMP', name:'Bumpers & Station IDs',  q:[S('bumper','bumpers','station id','station identification','ident','sign-off')]},
+  {n:97, cat:'ADS & TV', call:'VHS',  name:'Rewind VHS',             q:[S('vhs','vhs rip','videotape','home video')]},
+  {n:98, cat:'ADS & TV', call:'INFO', name:'Infomercial Island',     q:[S('infomercial','infomercials','home shopping')]},
+  {n:99, cat:'ADS & TV', call:'PUBA', name:'Public Access',          q:[S('public access','public access television','community television')]},
+  // ---- news, sports & lifestyle
+  {n:100,cat:'NEWS & MORE', call:'NEWS', name:'News & Public Affairs',q:['collection:newsandpublicaffairs']},
+  {n:101,cat:'NEWS & MORE', call:'DOCS', name:'Documentary Hour',    q:['subject:documentary']},
+  {n:102,cat:'NEWS & MORE', call:'SPRT', name:'Classic Sports',      q:[S('sports','football','baseball','boxing','basketball')]},
+  {n:103,cat:'NEWS & MORE', call:'WRST', name:'Wrestling Ring',      q:[S('wrestling','professional wrestling')]},
+  {n:104,cat:'NEWS & MORE', call:'CARS', name:'Gearhead TV',         q:[S('automobiles','automobile','cars','automotive','auto racing')]},
+  {n:105,cat:'NEWS & MORE', call:'COOK', name:'Kitchen Classics',    q:[S('cooking','recipes','cookery')]},
+  {n:106,cat:'NEWS & MORE', call:'TRVL', name:'Travelogue',          q:[S('travel','travelogue','travelogues')]},
+  {n:107,cat:'NEWS & MORE', call:'GYM',  name:'Aerobics Hour',       q:[S('aerobics','exercise','workout','fitness')]},
+  {n:108,cat:'NEWS & MORE', call:'HOME', name:'Home Movies',         q:[S('home movies','home movie')]},
+  {n:109,cat:'NEWS & MORE', call:'PREL', name:'Prelinger Archives',  q:['collection:prelinger']},
+  {n:110,cat:'NEWS & MORE', call:'EPHM', name:'Ephemeral Films',     q:['collection:ephemera']},
+  // ---- YouTube (premium tier)
+  {n:120,cat:'YOUTUBE',  call:'[AS]', name:'Adult Swim',             yt:['UCgPClNr5VSYC3syrDUIlzLw']},
+  {n:121,cat:'YOUTUBE',  call:'CN',   name:'Cartoon Network',        yt:['UCMsgXPD3wzzt8RxHJmXH7hQ','UCXoZJ2AaqhF8SF0Fgt2RYIw']},
+  {n:122,cat:'YOUTUBE',  call:'WBK',  name:'Looney Tunes · WB Kids', yt:['UC9trsD1jCTXXtN3xIOIU8gg']},
+  {n:123,cat:'YOUTUBE',  call:'BEAN', name:'Mr Bean',                yt:['UCkAGrHCLFmlK3H2kd6isipg']},
+  {n:124,cat:'YOUTUBE',  call:'PBSK', name:'PBS Kids',               yt:['UCmNIdCsMr-kjBzpzFH14cZg']},
+  {n:125,cat:'YOUTUBE',  call:'CNAS', name:'Cartoon Network Asia',   yt:['UC9hVEGaTpAYMVd-bRsOYKwA']},
+  {n:199,cat:'YOURS',    call:'MYCH', name:'Your Channel',           custom:true},
 ];
 let CHANNELS=[];
 
@@ -342,7 +457,7 @@ const state={on:false,num:saved.num||2,prev:null,vol:saved.vol??.7,muted:!!saved
   custom:saved.custom||'',userYT:Array.isArray(saved.userYT)?saved.userYT:[],guide:false,guideSel:0,digits:''};
 function save(){store.set({num:state.num,vol:state.vol,muted:state.muted,custom:state.custom,userYT:state.userYT})}
 function buildChannels(){
-  CHANNELS=BASE_CHANNELS.concat(state.userYT.map((u,i)=>({n:40+i,call:u.call||('YT'+(i+1)),name:u.name||'YouTube',yt:[u.id],user:true})))
+  CHANNELS=BASE_CHANNELS.concat(state.userYT.map((u,i)=>({n:200+i,cat:'YOURS',call:u.call||('YT'+(i+1)),name:u.name||'YouTube',yt:[u.id],user:true})))
     .sort((a,b)=>a.n-b.n);
 }
 buildChannels();
@@ -363,7 +478,15 @@ function stripHtml(s){const d=document.createElement('div');d.innerHTML=String(s
 function parseLen(l){if(l==null)return 0;l=String(l);if(l.includes(':'))return l.split(':').reduce((a,b)=>a*60+(parseFloat(b)||0),0);return parseFloat(l)||0}
 
 /* ---------- archive.org data ---------- */
-async function search(q,rows=200){
+// archive.org gets cranky with 100 searches at once; run a few at a time, tuning jumps the line
+let active=0;const waiting=[];
+async function limited(fn,urgent){
+  if(active>=4)await new Promise(r=>urgent?waiting.unshift(r):waiting.push(r));
+  active++;
+  try{return await fn()}finally{active--;const next=waiting.shift();if(next)next()}
+}
+async function search(q,rows=200,urgent){return limited(()=>searchNow(q,rows),urgent)}
+async function searchNow(q,rows){
   const p=new URLSearchParams({q,rows:String(rows),page:'1',output:'json'});
   ['identifier','title','year','creator','mediatype'].forEach(f=>p.append('fl[]',f));
   p.append('sort[]','downloads desc');
@@ -373,7 +496,7 @@ async function search(q,rows=200){
 }
 const lists=new Map(),listsDone=new Map();
 function listKey(ch){return ch.n+'|'+daySeed()+'|'+(ch.custom?state.custom:'')}
-function getList(ch){
+function getList(ch,urgent){
   const key=listKey(ch);
   if(!lists.has(key)){
     const pr=(async()=>{
@@ -381,8 +504,8 @@ function getList(ch){
       const type=ch.custom?'(movies OR audio)':ch.audio?'audio':'movies';
       for(const q of qs){
         const base=`(${q}) AND mediatype:${type}`;
-        let docs=await search(base+' AND -access-restricted-item:true',ch.rows||200);
-        if(!docs.length)docs=await search(base,ch.rows||200);
+        let docs=await search(base+' AND -access-restricted-item:true',ch.rows||200,urgent);
+        if(!docs.length)docs=await search(base,ch.rows||200,urgent);
         const seen=new Set();docs=docs.filter(d=>d.identifier&&!seen.has(d.identifier)&&seen.add(d.identifier));
         if(docs.length)return shuffle(docs,hash(daySeed(),ch.n));
       }
@@ -506,9 +629,9 @@ async function tune(num){
   if(state.guide)renderGuide();
   if(!ch)return noSignal();
   if(ch.yt)return ytTune(ch,token);
-  if(ch.custom&&!state.custom)return noSignal('CHANNEL 99','Press ★ SEARCH to program your own channel');
+  if(ch.custom&&!state.custom)return noSignal('CHANNEL 199','Press ★ SEARCH to program your own channel');
   let list;
-  try{list=await getList(ch)}catch{if(token===tuneToken)bars('TECHNICAL DIFFICULTIES','Can’t reach archive.org — please stand by');return}
+  try{list=await getList(ch,true)}catch{if(token===tuneToken)bars('TECHNICAL DIFFICULTIES','Can’t reach archive.org — please stand by');return}
   if(token!==tuneToken)return;
   if(!list.length)return noSignal('NO SIGNAL','Nothing is airing on this channel');
   const{slot,elapsed}=slotNow();
@@ -663,7 +786,8 @@ function toggleInfo(){
 }
 
 /* ---------- guide ---------- */
-let guideTimer=0;
+let guideTimer=0,guideRaf=0;
+function guideSoon(){if(!guideRaf)guideRaf=requestAnimationFrame(()=>{guideRaf=0;renderGuide()})}
 function slotTitle(ch,slot){
   if(ch.yt)return ch.name+(ch.user?'':' on YouTube');
   if(ch.custom&&!state.custom)return'— Press ★ to program —';
@@ -678,16 +802,18 @@ function renderGuide(){
   const{slot,start}=slotNow();
   $('#gClock').textContent=new Date().toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'});
   $('#gHead').innerHTML=`<div>CH</div>${[0,1,2].map(k=>`<div>${fmtTime(start+k*SLOT)}</div>`).join('')}`;
+  let lastCat='';
   $('#gRows').innerHTML=CHANNELS.map((ch,i)=>{
+    const head=ch.cat&&ch.cat!==lastCat?`<div class="g-cat">${esc(lastCat=ch.cat)}</div>`:'';
     const cells=[0,1,2].map(k=>{const t=slotTitle(ch,slot+k);return`<div class="g-cell${k?'':' now'}${/^(Loading|Off|No Signal|—)/.test(t)?' dim':''}">${esc(t)}</div>`}).join('');
-    return`<div class="g-row${i===state.guideSel?' sel':''}${ch.n===state.num?' tuned':''}" data-i="${i}"><div class="g-cell g-ch"><em>${ch.n}</em><span>${esc(ch.call)}</span></div>${cells}</div>`;
+    return head+`<div class="g-row${i===state.guideSel?' sel':''}${ch.n===state.num?' tuned':''}" data-i="${i}"><div class="g-cell g-ch"><em>${ch.n}</em><span>${esc(ch.call)}</span></div>${cells}</div>`;
   }).join('');
   const sel=CHANNELS[state.guideSel];
   if(sel){
-    const desc=sel.yt?'Clips, shorts and full episodes from the official YouTube channel.':sel.custom?(state.custom?`Searching archive.org for “${state.custom}”.`:'Your own channel — search anything on archive.org.'):`From the archive.org ${sel.audio?'audio':'moving image'} collection.`;
+    const desc=sel.desc||(sel.yt?'Clips, shorts and full episodes from the official YouTube channel.':sel.custom?(state.custom?`Searching archive.org for “${state.custom}”.`:'Your own channel — search anything on archive.org.'):`${sel.cat?sel.cat.charAt(0)+sel.cat.slice(1).toLowerCase()+' from':'From'} the archive.org ${sel.audio?'audio':'moving image'} collection.`);
     $('#gDesc').innerHTML=`<b>${esc(slotTitle(sel,slot))}</b><small>CH ${sel.n} · ${esc(sel.name)} · Now until ${fmtTime(start+SLOT)}</small>${esc(desc)}<small>Next: ${esc(slotTitle(sel,slot+1))}</small>`;
   }
-  const row=$('#gRows').children[state.guideSel];if(row)row.scrollIntoView({block:'nearest'});
+  const row=$(`#gRows [data-i="${state.guideSel}"]`);if(row)row.scrollIntoView({block:'nearest'});
 }
 function openGuide(){
   if(!state.on)return;
@@ -695,7 +821,9 @@ function openGuide(){
   state.guideSel=Math.max(0,CHANNELS.findIndex(c=>c.n===state.num));
   $('#banner').classList.remove('show');$('#info').classList.remove('show');
   renderGuide();
-  CHANNELS.forEach(ch=>{if(ch.q||(ch.custom&&state.custom))getList(ch).then(renderGuide,renderGuide)});
+  const sel=state.guideSel;
+  CHANNELS.map((ch,i)=>[ch,Math.abs(i-sel)]).sort((a,b)=>a[1]-b[1])
+    .forEach(([ch])=>{if(ch.q||(ch.custom&&state.custom))getList(ch).then(guideSoon,guideSoon)});
   clearInterval(guideTimer);guideTimer=setInterval(renderGuide,20000);
 }
 function closeGuide(){state.guide=false;$('#screen').classList.remove('guide-open');clearInterval(guideTimer)}
@@ -709,7 +837,7 @@ function openTuner(){
 }
 function closeTuner(){$('#tuner').classList.remove('show');document.activeElement&&document.activeElement.blur()}
 function renderYTList(){
-  $('#ytList').innerHTML=state.userYT.length?state.userYT.map((u,i)=>`<div><span>CH ${40+i} · ${esc(u.name)}</span><button type="button" data-rm="${i}">REMOVE</button></div>`).join(''):'';
+  $('#ytList').innerHTML=state.userYT.length?state.userYT.map((u,i)=>`<div><span>CH ${200+i} · ${esc(u.name)}</span><button type="button" data-rm="${i}">REMOVE</button></div>`).join(''):'';
 }
 function parseYT(s){
   s=s.trim();
@@ -720,7 +848,7 @@ function parseYT(s){
 }
 $('#tuner').addEventListener('submit',e=>{
   e.preventDefault();const q=$('#tunerQ').value.trim();if(!q)return;
-  state.custom=q;save();closeTuner();tune(99);
+  state.custom=q;save();closeTuner();tune(199);
 });
 $('#tunerYTAdd').addEventListener('click',()=>{
   const id=parseYT($('#tunerYT').value);
@@ -729,7 +857,7 @@ $('#tunerYTAdd').addEventListener('click',()=>{
   if(state.userYT.length>=9)state.userYT.shift();
   state.userYT.push({id,name,call:name.replace(/[^A-Za-z0-9]/g,'').slice(0,4).toUpperCase()||'YT'});
   save();buildChannels();renderYTList();$('#tunerYT').value='';$('#tunerYTName').value='';
-  closeTuner();tune(40+state.userYT.length-1);
+  closeTuner();tune(200+state.userYT.length-1);
 });
 $('#ytList').addEventListener('click',e=>{const i=e.target.dataset.rm;if(i==null)return;state.userYT.splice(+i,1);save();buildChannels();renderYTList()});
 $('#tunerClose').addEventListener('click',closeTuner);
@@ -769,10 +897,10 @@ function mute(){state.muted=!state.muted;applyVolume();noise(snowOn);osdVol();sa
 let digitTimer=0;
 function digit(d){
   if(!state.on)return;
-  state.digits+=d;osdChan(state.digits+(state.digits.length<2?'-':''));
+  state.digits+=d;osdChan(state.digits+'-'.repeat(3-state.digits.length));
   clearTimeout(digitTimer);
   const commit=()=>{const n=parseInt(state.digits,10);state.digits='';if(state.guide)closeGuide();if(n>0)tune(n)};
-  if(state.digits.length>=2)commit();else digitTimer=setTimeout(commit,1500);
+  if(state.digits.length>=3)commit();else digitTimer=setTimeout(commit,1500);
 }
 function act(a){
   irBlink();
