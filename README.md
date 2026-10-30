@@ -78,3 +78,18 @@ archive/YYYY-MM/<username>/monthly-summary.json
 - Restore by stopping the service and copying the desired `backups/data-YYYY-MM-DD.json` (or `data.prev.json`) over `data.json`.
 
 Rollback/stop: `systemctl --user stop torqueclock.service` or restore from a backup/archive snapshot before replacing `data.json`.
+
+## ArchiVision TV (`/tv.html`)
+
+A 90s-style CRT TV that channel-surfs archive.org and YouTube, at `http://<host>:8800/tv.html`
+(it's a single self-contained page, so you can also open `public/tv.html` straight in a browser).
+
+- Channels 2–24 are archive.org collections (classic TV, cartoons, feature films, noir, Prelinger,
+  commercials, Computer Chronicles, live concerts, 78s, old-time radio…). Channels 30–35 are YouTube
+  channels (Adult Swim, Cartoon Network, WB Kids/Looney Tunes, Mr Bean, PBS Kids, CN Asia), played
+  from each channel's uploads playlist. Channel 50 surfs all of archive.org, and channel 99 is your own search.
+- Every channel runs a daily schedule of 30-minute slots, so tuning in drops you into whatever is already on.
+  GUIDE shows the grid in the old Prevue style.
+- ★ SEARCH on the remote programs channel 99, and can add any other YouTube channel (by `/channel/UC…`
+  or playlist link) as channels 40+. These are saved in the browser.
+- Keys: ↑/↓ channel, ←/→ volume, 0–9 direct tune, G guide, I info, M mute, L last channel, S search, P power.
