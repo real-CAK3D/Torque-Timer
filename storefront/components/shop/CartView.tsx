@@ -13,7 +13,7 @@ export function CartView(props: { currency: string; shippingFlat: number; freeOv
     return (
       <div className="empty">
         <p>Your cart is empty.</p>
-        <Link href="/#shop" className="btn">Browse the shop</Link>
+        <Link href="/shop" className="btn">Browse the shop</Link>
       </div>
     );
   }
