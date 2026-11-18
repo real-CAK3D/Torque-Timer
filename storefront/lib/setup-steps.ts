@@ -159,6 +159,19 @@ export const SETUP_STEPS: SetupStep[] = [
     links: [{ label: "Stripe payment methods", url: "https://dashboard.stripe.com/settings/payment_methods" }],
   },
   {
+    id: "receipts",
+    title: "Turn on customer receipts",
+    time: "1 min",
+    blocks: [
+      { p: "In Stripe, go to **Settings > Customer emails** and turn on **Successful payments**. Customers then get a receipt from Stripe with your business name." },
+      { p: "While you're there, **Settings > Business > Public details** sets the name and support email shown on receipts and the checkout page, and **Branding** sets your logo and colors on the checkout page." },
+    ],
+    links: [
+      { label: "Stripe customer emails", url: "https://dashboard.stripe.com/settings/emails" },
+      { label: "Stripe branding", url: "https://dashboard.stripe.com/settings/branding" },
+    ],
+  },
+  {
     id: "products",
     title: "Add products (here or in Stripe)",
     time: "as long as you like",
@@ -196,19 +209,6 @@ export const SETUP_STEPS: SetupStep[] = [
     links: [
       { label: "Stripe: new coupon", url: "https://dashboard.stripe.com/coupons/create" },
       { label: "Open Discounts", url: "/admin/discounts" },
-    ],
-  },
-  {
-    id: "receipts",
-    title: "Turn on customer receipts",
-    time: "1 min",
-    blocks: [
-      { p: "In Stripe, go to **Settings > Customer emails** and turn on **Successful payments**. Customers then get a receipt from Stripe with your business name." },
-      { p: "While you're there, **Settings > Business > Public details** sets the name and support email shown on receipts and the checkout page, and **Branding** sets your logo and colors on the checkout page." },
-    ],
-    links: [
-      { label: "Stripe customer emails", url: "https://dashboard.stripe.com/settings/emails" },
-      { label: "Stripe branding", url: "https://dashboard.stripe.com/settings/branding" },
     ],
   },
   {
@@ -309,4 +309,13 @@ export const SETUP_STEPS: SetupStep[] = [
       { label: "Open Keys", url: "/admin/keys" },
     ],
   },
+];
+
+/** The tabs on the Setup page. Every step id must be in exactly one phase. */
+export const PHASES: { id: string; title: string; steps: string[] }[] = [
+  { id: "online", title: "Get online", steps: ["accounts", "copy", "password", "supabase"] },
+  { id: "payments", title: "Payments", steps: ["stripe", "webhook", "wallets", "receipts"] },
+  { id: "products", title: "Products", steps: ["products", "coupons", "push", "test-order"] },
+  { id: "extras", title: "Extras", steps: ["email", "domain", "tax"] },
+  { id: "live", title: "Go live", steps: ["live"] },
 ];

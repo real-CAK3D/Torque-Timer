@@ -7,16 +7,15 @@ export async function SetupChecklist() {
   const steps = SETUP_STEPS.filter((s) => s.check && !s.optional);
   const todo = steps.filter((s) => !st[s.check!].ok);
   if (!todo.length) return null;
+  const next = todo[0];
   return (
-    <section className="panel setup">
-      <div className="panel-head"><h2>Finish setting up ({steps.length - todo.length} of {steps.length})</h2><Link href="/admin/setup">Open setup guide</Link></div>
-      <ul className="checks">
-        {steps.map((s) => (
-          <li key={s.id} className={st[s.check!].ok ? "done" : ""}>
-            <Link href={`/admin/setup#${s.id}`}>{s.title}</Link>
-          </li>
-        ))}
-      </ul>
+    <section className="panel setup-next">
+      <div>
+        <h2>Finish setting up</h2>
+        <p className="muted">{steps.length - todo.length} of {steps.length} done. Next: <strong>{next.title}</strong></p>
+      </div>
+      <div className="meter"><span style={{ width: `${((steps.length - todo.length) / steps.length) * 100}%` }} /></div>
+      <Link href={`/admin/setup#${next.id}`} className="b b-primary b-sm">Continue setup</Link>
     </section>
   );
 }

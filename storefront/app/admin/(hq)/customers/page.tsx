@@ -1,4 +1,5 @@
 import { RemoveSubscriber } from "@/components/admin/RemoveSubscriber";
+import { Tabs } from "@/components/admin/Tabs";
 import { getSettings, getSubscribers } from "@/lib/db";
 import { money, shortDate } from "@/lib/format";
 import { getCustomers } from "@/lib/stats";
@@ -20,6 +21,11 @@ export default async function Customers() {
         <div className="tile"><span>Email sign-ups</span><strong>{subs.length}</strong></div>
         <div className="tile"><span>Average spent</span><strong>{money(list.length ? Math.round(list.reduce((n, c) => n + c.spent, 0) / list.length) : 0, s.currency)}</strong></div>
       </div>
+      <Tabs
+        label="Customer lists"
+        tabs={[
+          { id: "buyers", label: "Buyers", badge: list.length, content: (
+            <>
       {list.length ? (
         <section className="panel">
           <div className="tbl-scroll">
@@ -42,6 +48,10 @@ export default async function Customers() {
       ) : (
         <div className="panel"><p>Customers appear here after their first order.</p></div>
       )}
+            </>
+          ) },
+          { id: "signups", label: "Email sign-ups", badge: subs.length, content: (
+            <>
       <section className="panel">
         <div className="panel-head">
           <h2>Email sign-ups</h2>
@@ -64,6 +74,10 @@ export default async function Customers() {
           <p className="muted">No sign-ups yet. The sign-up box is in your shop&apos;s footer (turn it on or off in Settings).</p>
         )}
       </section>
+            </>
+          ) },
+        ]}
+      />
     </>
   );
 }

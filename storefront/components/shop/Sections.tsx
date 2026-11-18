@@ -24,7 +24,7 @@ export function About({ s }: { s: SiteSettings }) {
           <img src={s.aboutImage} alt="" className="about-img" />
         ) : null}
         <div className="prose">
-          <h2>{s.aboutTitle}</h2>
+          <h1>{s.aboutTitle}</h1>
           {paragraphs(s.about).map((p, i) => (
             <p key={i}>{p}</p>
           ))}
@@ -35,17 +35,17 @@ export function About({ s }: { s: SiteSettings }) {
   );
 }
 
-export function Contact({ s }: { s: SiteSettings }) {
+export function Contact({ s, always = false }: { s: SiteSettings; always?: boolean }) {
   const any = s.showContactForm || s.contactEmail || s.contactPhone || s.location || Object.values(s.social).some(Boolean);
-  if (!any) return null;
+  if (!any && !always) return null;
   return (
     <section id="contact" className="section contact">
       {/*
           EDIT-POINT: HOME-PAGE-SECTIONS
-          Layout of the About and Contact sections used by every layout. The
-          words themselves come from site-variables.ts (about, contact).
+          The About and Contact pages (/about, /contact). The words come from
+          site-variables.ts (about, contact) or the dashboard.
           */}
-      <h2>{s.contactHeading}</h2>
+      <h1>{s.contactHeading}</h1>
       {s.contactText ? <p className="muted">{s.contactText}</p> : null}
       <ul className="contact-list">
         {s.contactEmail ? (

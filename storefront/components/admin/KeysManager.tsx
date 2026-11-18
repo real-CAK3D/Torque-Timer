@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { KeyStatus } from "@/lib/keys";
 import { api } from "./api";
+import { Tabs } from "./Tabs";
 
 const SOURCE: Record<KeyStatus["source"], string> = {
   vercel: "Set in Vercel",
@@ -93,24 +94,8 @@ export function KeysManager({ initial, strong, onVercel }: { initial: KeyStatus[
   const groups = initial.reduce<Record<string, KeyStatus[]>>((m, k) => ((m[k.group] ??= []).push(k), m), {});
   const has = (n: string) => initial.some((k) => k.envName === n && (k.source === "vercel" || k.source === "dashboard"));
 
-  return (
-    <>
-      <div className="page-head">
-        <h1>Keys</h1>
-        <Link href="/admin/setup" className="b b-ghost b-sm">Setup guide</Link>
-      </div>
-      <p className="muted lead">
-        API keys connect the shop to other services. Paste one in and press Save; it&apos;s checked, then stored encrypted. Keys set in Vercel&apos;s environment
-        variables always win over keys saved here.
-      </p>
-      {!strong ? (
-        <p className="alert warn">For stronger protection of saved keys, add an <code>AUTH_SECRET</code> environment variable in Vercel (see Setup, step 3). Add it before saving keys here, since keys saved earlier will need re-entering.</p>
-      ) : null}
-      {msg ? <p className="alert" role="status">{msg}</p> : null}
-      {err ? <p className="err" role="alert">{err}</p> : null}
-
-      {Object.entries(groups).map(([group, keys]) => (
-        <section key={group} className="panel">
+  const groupPanel = (group: string, keys: KeyStatus[]) => (
+        <section className="panel">
           <div className="panel-head"><h2>{group}</h2></div>
           {group === "Stripe" ? (
             <div className="row wrap key-actions">
@@ -134,8 +119,8 @@ export function KeysManager({ initial, strong, onVercel }: { initial: KeyStatus[
             {keys.map((k) => <KeyRow key={k.envName} k={k} onDone={done} />)}
           </ul>
         </section>
-      ))}
-
+  );
+  const addPanel = (
       <section className="panel">
         <div className="panel-head"><h2>Add another key</h2></div>
         <p className="muted small">For any other service you start using (shipping labels, email marketing, analytics). Give it the name that service or its instructions use, like <code>SHIPPO_API_KEY</code>. Code can read it with <code>getKey(&quot;SHIPPO_API_KEY&quot;)</code> (see the API-KEYS edit point).</p>
@@ -145,6 +130,36 @@ export function KeysManager({ initial, strong, onVercel }: { initial: KeyStatus[
           <button className="b b-primary b-sm" disabled={!custom.name || !custom.value || Boolean(busy)}>{busy === "custom" ? "Saving…" : "Save key"}</button>
         </form>
       </section>
+  );
+
+  return (
+    <>
+      <div className="page-head">
+        <h1>Keys</h1>
+        <Link href="/admin/setup" className="b b-ghost b-sm">Setup guide</Link>
+      </div>
+      <p className="muted lead">
+        API keys connect the shop to other services. Paste one in and press Save; it&apos;s checked, then stored encrypted. Keys set in Vercel&apos;s environment
+        variables always win over keys saved here.
+      </p>
+      {!strong ? (
+        <p className="alert warn">For stronger protection of saved keys, add an <code>AUTH_SECRET</code> environment variable in Vercel (see Setup, step 3). Add it before saving keys here, since keys saved earlier will need re-entering.</p>
+      ) : null}
+      {msg ? <p className="alert" role="status">{msg}</p> : null}
+      {err ? <p className="err" role="alert">{err}</p> : null}
+
+      <Tabs
+        label="Key groups"
+        tabs={[
+          ...Object.entries(groups).map(([group, keys]) => ({
+            id: group.toLowerCase().replace(/[^a-z]+/g, "-"),
+            label: group,
+            badge: `${keys.filter((k) => k.source === "vercel" || k.source === "dashboard").length}/${keys.length}`,
+            content: groupPanel(group, keys),
+          })),
+          ...(groups["Other keys"] ? [] : [{ id: "other-keys", label: "Other keys", content: null }]),
+        ].map((t) => (t.id === "other-keys" ? { ...t, content: <>{t.content}{addPanel}</> } : t))}
+      />
     </>
   );
 }

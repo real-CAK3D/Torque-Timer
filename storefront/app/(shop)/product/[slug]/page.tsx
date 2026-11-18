@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/shop/AddToCart";
 import { Gallery } from "@/components/shop/Gallery";
 import { Price, StockNote } from "@/components/shop/Price";
+import { categoryHref } from "@/components/shop/layouts/types";
 import { Tracker } from "@/components/shop/Tracker";
 import { getProductBySlug, getSettings } from "@/lib/db";
 import { paragraphs } from "@/lib/format";
@@ -23,7 +24,7 @@ export default async function ProductPage({ params }: Params) {
   return (
     <article className="product">
       <Tracker productId={p.id} />
-      <Link href="/#shop" className="back">Back to shop</Link>
+      <Link href={categoryHref(p.category || null)} className="back">Back to {p.category || "shop"}</Link>
       <div className="product-grid">
         <Gallery p={p} />
         <div className="product-info">

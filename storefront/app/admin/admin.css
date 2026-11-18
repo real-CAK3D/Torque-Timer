@@ -354,7 +354,7 @@ body:has(.hq) { background: #F2F3EF; }
 .setup-step > details > summary::-webkit-details-marker { display: none; }
 .setup-title { display: grid; gap: 0.1rem; }
 .badge { flex: none; width: 1.9rem; height: 1.9rem; border-radius: 50%; display: grid; place-items: center; font-weight: 700; border: 2px solid var(--line); color: var(--muted); }
-.badge:empty::before { content: counter(step); }
+
 .badge.ok { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .badge.todo { border-color: var(--gold); color: var(--ink); }
 .setup-step.is-done { opacity: 0.8; }
@@ -374,3 +374,33 @@ body:has(.hq) { background: #F2F3EF; }
 .checks li:not(.done) a { color: var(--ink); font-weight: 600; }
 
 .hq a.b-primary { color: var(--accent-ink); }
+
+/* nav groups and tabs */
+.hq-side { gap: 0.9rem; overflow-y: auto; }
+.hq-side-group { display: grid; gap: 2px; }
+.hq-side-head { font-size: 0.75rem; font-weight: 700; color: var(--muted); padding: 0 0.8rem 0.2rem; letter-spacing: 0.02em; }
+.more-group { display: grid; gap: 0.5rem; }
+.more-group h2 { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+.tabs { display: grid; gap: 1.2rem; scroll-margin-top: 70px; }
+.tabbar {
+  display: flex; gap: 0.25rem; overflow-x: auto; scrollbar-width: none;
+  position: sticky; top: 62px; z-index: 15;
+  background: var(--bg); padding: 0.4rem 0; border-bottom: 1px solid var(--line);
+}
+.tabbar::-webkit-scrollbar { display: none; }
+.tabbar button {
+  flex: none; border: 0; background: none; color: var(--muted); cursor: pointer;
+  font: 600 0.95rem "Barlow", sans-serif; padding: 0.55rem 0.9rem; border-radius: 8px;
+  display: inline-flex; gap: 0.4rem; align-items: center;
+}
+.tabbar button:hover { color: var(--ink); background: var(--surface-2); }
+.tabbar button[aria-selected="true"] { color: var(--ink); background: var(--surface); box-shadow: inset 0 -3px 0 var(--accent); }
+.tab-badge { font-size: 0.72rem; background: var(--surface-2); color: var(--muted); border-radius: 999px; padding: 0.05rem 0.45rem; }
+.tabbar button[aria-selected="true"] .tab-badge { background: var(--accent); color: var(--accent-ink); }
+.tabpanel { display: grid; gap: 1.2rem; align-content: start; }
+.tabpanel[hidden] { display: none; }
+.image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.4rem; }
+.setup-next { display: grid; grid-template-columns: 1fr minmax(120px, 220px) auto; gap: 1rem; align-items: center; }
+.setup-next p { margin: 0.2rem 0 0; }
+@media (max-width: 700px) { .setup-next { grid-template-columns: 1fr; } }
+.hq a.b-primary.b-sm { justify-self: start; }

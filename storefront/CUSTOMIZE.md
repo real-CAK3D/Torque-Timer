@@ -54,10 +54,10 @@ Find one by searching the repository for `EDIT-POINT: NAME` (on GitHub press `/`
 |---|---|---|
 | `SITE-VARIABLES` | `site-variables.ts` | All words, prices, products and settings (see above) |
 | `THEMES` | `lib/themes.ts` | Add or change color/font themes |
-| `LAYOUTS` | `lib/themes.ts` | List of home page layouts |
+| `LAYOUTS` | `lib/themes.ts` | The four layouts for the home and Shop pages |
 | `STOREFRONT-STYLES` | `app/shop.css` | Shape, spacing and sizes on the shop |
-| `HOME-PAGE-SECTIONS` | `components/shop/Sections.tsx` | Layout of the About and Contact sections |
-| `NAV-LINKS` | `components/shop/Header.tsx` | Menu links in the shop's top bar |
+| `HOME-PAGE-SECTIONS` | `components/shop/Sections.tsx` | The About and Contact pages |
+| `NAV-LINKS` | `components/shop/NavLinks.tsx` | Menu links in the shop's top bar (and the phone menu) |
 | `FOOTER` | `components/shop/Footer.tsx` | Small print at the bottom |
 | `EMBLEM` | `components/shop/Emblem.tsx` | Built-in badge shown before a logo is uploaded |
 | `SOCIAL-NETWORKS` | `components/shop/Social.tsx` | Which social sites can be linked |

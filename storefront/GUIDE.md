@@ -229,10 +229,12 @@ Tap a **theme** (colors and fonts) and a **page layout**. The preview at the bot
 
 #### Layouts
 
-- **Garrison**: big welcome with your patch, featured items, then everything else.
-- **Field Manual**: sidebar with your categories; items grouped by category.
+- **Garrison**: big welcome with your patch, featured items and category tiles. The Shop page is a grid.
+- **Field Manual**: a sidebar with your categories on every page.
 - **Showroom**: full-width photo on top and large rows for each item. Upload a welcome photo for this one.
 - **Quartermaster**: compact list with add-to-cart buttons. Best with lots of items.
+
+Every layout splits the shop into pages instead of one long scroll: a home page (welcome, featured items, categories, a short about), a **Shop** page with category tabs and page numbers, plus **About** and **Contact** pages.
 
 <a id="settings"></a>
 ### Settings
@@ -268,7 +270,7 @@ An API key is a long password that lets the shop talk to another service. Paste 
 
 _Messages from your shop's contact form._
 
-When a customer fills in the contact form at the bottom of your shop, the message lands here and you get a notification. Tap one to read it, and **Reply** to answer from your own email.
+When a customer fills in the form on your shop's **Contact** page, the message lands here and you get a notification. Tap one to read it, and **Reply** to answer from your own email.
 
 Turn the form on or off in **Settings > Checkout & emails**.
 
@@ -393,11 +395,12 @@ _Where the site lives and where your data is kept._
 
 _A walk through the shop from a customer's side._
 
-1. The home page shows your banner, headline, patch or logo, items, about story and contact info, arranged by your chosen layout.
-2. Tapping an item opens its page: photos, price, description, the choice list and quantity, and **Add to cart**.
-3. The cart shows the subtotal, shipping, and how much more is needed for free shipping.
-4. **Check out** opens Stripe, where they enter shipping details and pay.
-5. They land on a thank-you page with their order number, and Stripe emails a receipt.
+1. The home page shows your banner, headline, patch or logo, featured items, categories and the start of your story, arranged by your chosen layout.
+2. **Shop** lists everything, with a tab for each category and 12 or so items per page. **About** has your full story and **Contact** has your details and the message form.
+3. Tapping an item opens its page: photos, price, description, the choice list and quantity, and **Add to cart**.
+4. The cart shows the subtotal, shipping, and how much more is needed for free shipping.
+5. **Check out** opens Stripe, where they enter shipping details and pay.
+6. They land on a thank-you page with their order number, and Stripe emails a receipt.
 
 Nothing on the shop links to the dashboard, and search engines are told not to list it.
 

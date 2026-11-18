@@ -61,7 +61,7 @@ export const SITE_VARIABLES = {
     intro:
       "Small-batch goods made in a home workshop by a U.S. Army Military Police veteran. Every piece gets the same attention to detail as a pre-inspection.",
     featuredHeading: "Featured", // above items marked featured: true
-    allItemsHeading: "Everything else", // above the rest of the items
+    allItemsHeading: "Shop", // heading on the Shop page (the page with every item)
   },
 
   // About

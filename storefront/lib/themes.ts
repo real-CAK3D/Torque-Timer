@@ -213,33 +213,34 @@ export type Layout = { id: string; name: string; description: string; sketch: st
 
 /*
  * EDIT-POINT: LAYOUTS
- * The home page layouts. Each id here has a matching file in
- * components/shop/layouts/ and a line in app/(shop)/page.tsx that picks it.
- * To add one: copy a layout file, add an entry here, add it to page.tsx.
+ * How the home page and the Shop page are arranged. Each id here has a file in
+ * components/shop/layouts/ with a Home and a Catalog view, listed in
+ * components/shop/layouts/index.tsx. To add one: copy a layout file, rename
+ * the two functions, add them to index.tsx and add an entry here.
  */
 export const LAYOUTS: Layout[] = [
   {
     id: "garrison",
     name: "Garrison",
-    description: "Classic storefront: big welcome, featured items, then the full grid.",
+    description: "Big welcome with your patch, featured items and category tiles. Shop page is a grid.",
     sketch: "▬▬▬▬▬▬\n  ◉ HERO  \n▢ ▢ ▢ ▢\n▢ ▢ ▢ ▢\n ABOUT ",
   },
   {
     id: "field-manual",
     name: "Field Manual",
-    description: "Sidebar with categories and contact; products organized by section.",
+    description: "Sidebar with your categories on every page; pick one to see just those items.",
     sketch: "▌▢ ▢ ▢\n▌▢ ▢ ▢\n▌▢ ▢ ▢\n▌      ",
   },
   {
     id: "showroom",
     name: "Showroom",
-    description: "Full-width photo up top and large, story-style product rows.",
+    description: "Full-width photo up top and large, story-style rows for each item.",
     sketch: "██████\n██████\n▢▢ ═══\n═══ ▢▢",
   },
   {
     id: "quartermaster",
     name: "Quartermaster",
-    description: "Compact catalog list. Best when there are lots of items.",
+    description: "Compact list with add-to-cart buttons. Best when there are lots of items.",
     sketch: "▬▬▬▬▬▬\n▪ ─── $\n▪ ─── $\n▪ ─── $",
   },
 ];

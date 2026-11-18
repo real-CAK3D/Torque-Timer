@@ -240,12 +240,13 @@ export const HELP: HelpGroup[] = [
           { h: "Layouts" },
           {
             list: [
-              "**Garrison**: big welcome with your patch, featured items, then everything else.",
-              "**Field Manual**: sidebar with your categories; items grouped by category.",
+              "**Garrison**: big welcome with your patch, featured items and category tiles. The Shop page is a grid.",
+              "**Field Manual**: a sidebar with your categories on every page.",
               "**Showroom**: full-width photo on top and large rows for each item. Upload a welcome photo for this one.",
               "**Quartermaster**: compact list with add-to-cart buttons. Best with lots of items.",
             ],
           },
+          { p: "Every layout splits the shop into pages instead of one long scroll: a home page (welcome, featured items, categories, a short about), a **Shop** page with category tabs and page numbers, plus **About** and **Contact** pages." },
         ],
       },
       {
@@ -292,7 +293,7 @@ export const HELP: HelpGroup[] = [
         match: ["/admin/inbox"],
         summary: "Messages from your shop's contact form.",
         blocks: [
-          { p: "When a customer fills in the contact form at the bottom of your shop, the message lands here and you get a notification. Tap one to read it, and **Reply** to answer from your own email." },
+          { p: "When a customer fills in the form on your shop's **Contact** page, the message lands here and you get a notification. Tap one to read it, and **Reply** to answer from your own email." },
           { p: "Turn the form on or off in **Settings > Checkout & emails**." },
         ],
       },
@@ -442,7 +443,8 @@ export const HELP: HelpGroup[] = [
         blocks: [
           {
             steps: [
-              "The home page shows your banner, headline, patch or logo, items, about story and contact info, arranged by your chosen layout.",
+              "The home page shows your banner, headline, patch or logo, featured items, categories and the start of your story, arranged by your chosen layout.",
+              "**Shop** lists everything, with a tab for each category and 12 or so items per page. **About** has your full story and **Contact** has your details and the message form.",
               "Tapping an item opens its page: photos, price, description, the choice list and quantity, and **Add to cart**.",
               "The cart shows the subtotal, shipping, and how much more is needed for free shipping.",
               "**Check out** opens Stripe, where they enter shipping details and pay.",

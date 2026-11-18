@@ -10,7 +10,7 @@ export function Footer({ s }: { s: SiteSettings }) {
     { href: "/policies/returns", label: "Returns", show: Boolean(s.returnPolicy) },
     { href: "/policies/privacy", label: "Privacy", show: Boolean(s.privacyPolicy) },
     { href: "/policies/terms", label: "Terms", show: Boolean(s.termsOfService) },
-    { href: "/#contact", label: "Contact", show: true },
+    { href: "/contact", label: "Contact", show: true },
   ].filter((l) => l.show);
   return (
     <footer className="footer">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { DashboardCharts } from "@/components/admin/ChartsClient";
 import { RangePicker } from "@/components/admin/RangePicker";
 import { SetupChecklist } from "@/components/admin/SetupChecklist";
+import { Tabs } from "@/components/admin/Tabs";
 import { getOrders, getSettings } from "@/lib/db";
 import { money, shortDate } from "@/lib/format";
 import { getStats } from "@/lib/stats";
@@ -34,8 +35,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           ))}
         </div>
       ) : null}
-      <DashboardCharts days={st.days} currency={c} />
-      <div className="two">
+      <Tabs
+        label="Dashboard sections"
+        tabs={[
+          { id: "charts", label: "Charts", content: <DashboardCharts days={st.days} currency={c} /> },
+          { id: "orders", label: "Recent orders", badge: st.toShip ? `${st.toShip} to ship` : undefined, content: (
+            <>
         <section className="panel">
           <div className="panel-head"><h2>Recent orders</h2><Link href="/admin/orders">All orders</Link></div>
           {recent.length ? (
@@ -55,6 +60,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             <p className="muted">No orders yet. When someone checks out, it lands here and on your phone.</p>
           )}
         </section>
+            </>
+          ) },
+          { id: "items", label: "Popular items", content: (
+            <>
         <section className="panel">
           <div className="panel-head"><h2>Best sellers</h2></div>
           {st.topSellers.length ? (
@@ -76,7 +85,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             </>
           ) : null}
         </section>
-      </div>
+            </>
+          ) },
+        ]}
+      />
       <p className="muted small">Average order {money(st.avgOrder, c)}, {st.views} page views, expenses {money(st.expenseTotal, c)}</p>
     </>
   );

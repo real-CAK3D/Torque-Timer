@@ -3,7 +3,7 @@
 // Run: npm run guide
 import { writeFileSync } from "fs";
 import { HELP } from "../lib/help.ts";
-import { DEPLOY_URL, SETUP_STEPS } from "../lib/setup-steps.ts";
+import { DEPLOY_URL, PHASES, SETUP_STEPS } from "../lib/setup-steps.ts";
 
 function blockLines(b) {
   if ("p" in b) return [b.p, ""];
@@ -48,13 +48,24 @@ const setup = [
   "",
   `[![Deploy with Vercel](https://vercel.com/button)](${DEPLOY_URL})`,
   "",
-  "| | Step | Time |",
-  "|---|---|---|",
-  ...SETUP_STEPS.map((st, i) => `| ${i + 1} | [${st.title}](#${st.id})${st.optional ? " _(optional)_" : ""} | ${st.time} |`),
-  "",
 ];
+const num = new Map(SETUP_STEPS.map((st, i) => [st.id, i + 1]));
+for (const ph of PHASES) {
+  setup.push(`**${ph.title}**`, "");
+  for (const id of ph.steps) {
+    const st = SETUP_STEPS.find((x) => x.id === id);
+    setup.push(`${num.get(id)}. [${st.title}](#${st.id})${st.optional ? " (optional)" : ""}, ${st.time}`);
+  }
+  setup.push("");
+}
+let lastPhase = "";
 SETUP_STEPS.forEach((st, i) => {
-  setup.push(`<a id="${st.id}"></a>`, `## ${i + 1}. ${st.title}${st.optional ? " (optional)" : ""}`, "");
+  const ph = PHASES.find((p) => p.steps.includes(st.id));
+  if (ph && ph.id !== lastPhase) {
+    setup.push(`## ${ph.title}`, "");
+    lastPhase = ph.id;
+  }
+  setup.push(`<a id="${st.id}"></a>`, `### ${i + 1}. ${st.title}${st.optional ? " (optional)" : ""}`, "");
   for (const b of st.blocks) setup.push(...blockLines(b));
   if (st.links?.length) {
     setup.push("Links: " + st.links.map((l) => (l.url.startsWith("/") ? `${l.label} (dashboard, \`${l.url}\`)` : `[${l.label}](${l.url})`)).join(", "), "");

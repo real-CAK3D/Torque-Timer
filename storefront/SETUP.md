@@ -6,27 +6,41 @@ Getting the shop online, in order: GitHub, Vercel, Supabase, then Stripe (which 
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Freal-cak3d%2FTorque-Timer%2Ftree%2Fmain%2Fstorefront&project-name=shop&repository-name=shop&env=ADMIN_PASSWORD%2CAUTH_SECRET&envDescription=ADMIN_PASSWORD+is+your+dashboard+login.+AUTH_SECRET+is+any+long+random+text+%28mash+the+keyboard%2C+40%2B+characters%29.)
 
-| | Step | Time |
-|---|---|---|
-| 1 | [Make your accounts](#accounts) | 10 min |
-| 2 | [Get your own copy of the site](#copy) | 5 min |
-| 3 | [Check your login](#password) | 1 min |
-| 4 | [Connect Supabase (your database and photo storage)](#supabase) | 3 min |
-| 5 | [Connect Stripe](#stripe) | 3 min |
-| 6 | [Webhook connected](#webhook) | 1 click |
-| 7 | [Turn on Apple Pay and Google Pay](#wallets) | 2 min |
-| 8 | [Add products (here or in Stripe)](#products) | as long as you like |
-| 9 | [Coupons and promo codes](#coupons) _(optional)_ | 2 min |
-| 10 | [Turn on customer receipts](#receipts) | 1 min |
-| 11 | [Phone notifications](#push) | 3 min |
-| 12 | [Place a test order](#test-order) | 3 min |
-| 13 | [Tracking emails](#email) _(optional)_ | 10 min |
-| 14 | [Your own web address](#domain) _(optional)_ | 10 min |
-| 15 | [Sales tax](#tax) _(optional)_ | 10 min |
-| 16 | [Go live](#live) | 15 min |
+**Get online**
+
+1. [Make your accounts](#accounts), 10 min
+2. [Get your own copy of the site](#copy), 5 min
+3. [Check your login](#password), 1 min
+4. [Connect Supabase (your database and photo storage)](#supabase), 3 min
+
+**Payments**
+
+5. [Connect Stripe](#stripe), 3 min
+6. [Webhook connected](#webhook), 1 click
+7. [Turn on Apple Pay and Google Pay](#wallets), 2 min
+8. [Turn on customer receipts](#receipts), 1 min
+
+**Products**
+
+9. [Add products (here or in Stripe)](#products), as long as you like
+10. [Coupons and promo codes](#coupons) (optional), 2 min
+11. [Phone notifications](#push), 3 min
+12. [Place a test order](#test-order), 3 min
+
+**Extras**
+
+13. [Tracking emails](#email) (optional), 10 min
+14. [Your own web address](#domain) (optional), 10 min
+15. [Sales tax](#tax) (optional), 10 min
+
+**Go live**
+
+16. [Go live](#live), 15 min
+
+## Get online
 
 <a id="accounts"></a>
-## 1. Make your accounts
+### 1. Make your accounts
 
 You need three free accounts. Use the same email for all of them to keep things simple.
 
@@ -39,7 +53,7 @@ You need three free accounts. Use the same email for all of them to keep things 
 Links: [GitHub sign up](https://github.com/signup), [Vercel sign up](https://vercel.com/signup), [Stripe sign up](https://dashboard.stripe.com/register)
 
 <a id="copy"></a>
-## 2. Get your own copy of the site
+### 2. Get your own copy of the site
 
 **Easiest: the Deploy button.** It copies the shop into a new repository on your GitHub and puts it on Vercel at the same time.
 
@@ -59,7 +73,7 @@ Links: [GitHub sign up](https://github.com/signup), [Vercel sign up](https://ver
 Links: [Deploy to Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Freal-cak3d%2FTorque-Timer%2Ftree%2Fmain%2Fstorefront&project-name=shop&repository-name=shop&env=ADMIN_PASSWORD%2CAUTH_SECRET&envDescription=ADMIN_PASSWORD+is+your+dashboard+login.+AUTH_SECRET+is+any+long+random+text+%28mash+the+keyboard%2C+40%2B+characters%29.), [Vercel: import a project](https://vercel.com/new)
 
 <a id="password"></a>
-## 3. Check your login
+### 3. Check your login
 
 Go to your new web address with `/admin` on the end and log in with your ADMIN_PASSWORD. You're in the dashboard you're reading now.
 
@@ -68,7 +82,7 @@ To change the password later, use **Settings > Password**.
 > **Tip:** If AUTH_SECRET shows a warning below, add it in Vercel > your project > Settings > Environment Variables, then redeploy (Deployments > ⋯ > Redeploy).
 
 <a id="supabase"></a>
-## 4. Connect Supabase (your database and photo storage)
+### 4. Connect Supabase (your database and photo storage)
 
 1. In Vercel, open your project and click the **Storage** tab.
 2. Click **Create Database**, choose **Supabase**, and follow the prompts (the free plan is plenty). Pick the region closest to you.
@@ -80,8 +94,10 @@ To change the password later, use **Settings > Password**.
 
 Links: [Vercel dashboard](https://vercel.com/dashboard)
 
+## Payments
+
 <a id="stripe"></a>
-## 5. Connect Stripe
+### 5. Connect Stripe
 
 1. In Stripe, make sure **Test mode** is on (top right) while you set up.
 2. Go to **Developers > API keys** and click **Reveal** next to **Secret key** (starts with `sk_test_`). Copy it.
@@ -91,14 +107,14 @@ Links: [Vercel dashboard](https://vercel.com/dashboard)
 Links: [Stripe API keys](https://dashboard.stripe.com/test/apikeys), Open Keys (dashboard, `/admin/keys`)
 
 <a id="webhook"></a>
-## 6. Webhook connected
+### 6. Webhook connected
 
 Done from **Keys > Connect Stripe webhook** (step above). If it's not green, press that button again from your live web address.
 
 Links: Open Keys (dashboard, `/admin/keys`)
 
 <a id="wallets"></a>
-## 7. Turn on Apple Pay and Google Pay
+### 7. Turn on Apple Pay and Google Pay
 
 1. In Stripe, go to **Settings > Payments > Payment methods**.
 2. Make sure **Cards**, **Apple Pay** and **Google Pay** are on. Link (Stripe's one-click checkout) is a nice extra.
@@ -108,8 +124,19 @@ Links: Open Keys (dashboard, `/admin/keys`)
 
 Links: [Stripe payment methods](https://dashboard.stripe.com/settings/payment_methods)
 
+<a id="receipts"></a>
+### 8. Turn on customer receipts
+
+In Stripe, go to **Settings > Customer emails** and turn on **Successful payments**. Customers then get a receipt from Stripe with your business name.
+
+While you're there, **Settings > Business > Public details** sets the name and support email shown on receipts and the checkout page, and **Branding** sets your logo and colors on the checkout page.
+
+Links: [Stripe customer emails](https://dashboard.stripe.com/settings/emails), [Stripe branding](https://dashboard.stripe.com/settings/branding)
+
+## Products
+
 <a id="products"></a>
-## 8. Add products (here or in Stripe)
+### 9. Add products (here or in Stripe)
 
 Either way works, and you can mix them:
 
@@ -122,7 +149,7 @@ Extra details for Stripe products go in the product's **Metadata** (bottom of th
 Links: [Stripe: add a product](https://dashboard.stripe.com/products/create), Open Products (dashboard, `/admin/products`)
 
 <a id="coupons"></a>
-## 9. Coupons and promo codes (optional)
+### 10. Coupons and promo codes (optional)
 
 1. In Stripe, go to **Product catalog > Coupons > + New**.
 2. Choose a percentage or amount off and how long it lasts.
@@ -131,17 +158,8 @@ Links: [Stripe: add a product](https://dashboard.stripe.com/products/create), Op
 
 Links: [Stripe: new coupon](https://dashboard.stripe.com/coupons/create), Open Discounts (dashboard, `/admin/discounts`)
 
-<a id="receipts"></a>
-## 10. Turn on customer receipts
-
-In Stripe, go to **Settings > Customer emails** and turn on **Successful payments**. Customers then get a receipt from Stripe with your business name.
-
-While you're there, **Settings > Business > Public details** sets the name and support email shown on receipts and the checkout page, and **Branding** sets your logo and colors on the checkout page.
-
-Links: [Stripe customer emails](https://dashboard.stripe.com/settings/emails), [Stripe branding](https://dashboard.stripe.com/settings/branding)
-
 <a id="push"></a>
-## 11. Phone notifications
+### 11. Phone notifications
 
 1. On **Keys**, press **Create notification keys**.
 2. On your iPhone, open your site's `/admin` in Safari, tap **Share > Add to Home Screen**.
@@ -150,14 +168,16 @@ Links: [Stripe customer emails](https://dashboard.stripe.com/settings/emails), [
 Links: Open Keys (dashboard, `/admin/keys`)
 
 <a id="test-order"></a>
-## 12. Place a test order
+### 12. Place a test order
 
 1. Open your shop, add something to the cart and check out.
 2. Pay with card `4242 4242 4242 4242`, any future date, any 3-digit code and any ZIP.
 3. You should land on the thank-you page, see the order in **Orders**, and get a notification.
 
+## Extras
+
 <a id="email"></a>
-## 13. Tracking emails (optional)
+### 13. Tracking emails (optional)
 
 Lets you email customers their tracking number with one tap from an order.
 
@@ -170,7 +190,7 @@ Lets you email customers their tracking number with one tap from an order.
 Links: [Resend](https://resend.com/signup)
 
 <a id="domain"></a>
-## 14. Your own web address (optional)
+### 14. Your own web address (optional)
 
 1. Buy a domain (for example in Vercel > Domains, or any registrar).
 2. In Vercel, open your project > **Settings > Domains**, add it, and follow the instructions to point it at Vercel.
@@ -179,7 +199,7 @@ Links: [Resend](https://resend.com/signup)
 Links: [Vercel domains](https://vercel.com/domains)
 
 <a id="tax"></a>
-## 15. Sales tax (optional)
+### 15. Sales tax (optional)
 
 Stripe Tax works out and adds the right sales tax at checkout. Set it up in Stripe under **Settings > Tax** (add your address and where you're registered), then turn on **Sales tax by Stripe** in **Settings > Checkout & emails**.
 
@@ -187,8 +207,10 @@ Stripe Tax works out and adds the right sales tax at checkout. Set it up in Stri
 
 Links: [Stripe Tax](https://dashboard.stripe.com/settings/tax)
 
+## Go live
+
 <a id="live"></a>
-## 16. Go live
+### 16. Go live
 
 1. In Stripe, finish **Activate payments** (business details and bank account).
 2. Switch off **Test mode**, go to **Developers > API keys** and copy the live **Secret key** (`sk_live_`).
