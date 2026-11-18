@@ -1,5 +1,6 @@
 import { paragraphs } from "@/lib/format";
 import type { SiteSettings } from "@/lib/types";
+import { ContactForm } from "./ContactForm";
 import { Social } from "./Social";
 
 export function VeteranBadge({ s }: { s: SiteSettings }) {
@@ -35,7 +36,7 @@ export function About({ s }: { s: SiteSettings }) {
 }
 
 export function Contact({ s }: { s: SiteSettings }) {
-  const any = s.contactEmail || s.contactPhone || s.location || Object.values(s.social).some(Boolean);
+  const any = s.showContactForm || s.contactEmail || s.contactPhone || s.location || Object.values(s.social).some(Boolean);
   if (!any) return null;
   return (
     <section id="contact" className="section contact">
@@ -60,6 +61,7 @@ export function Contact({ s }: { s: SiteSettings }) {
         {s.location ? <li>{s.location}</li> : null}
       </ul>
       <Social links={s.social} />
+      {s.showContactForm ? <ContactForm /> : null}
     </section>
   );
 }

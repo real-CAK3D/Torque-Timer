@@ -5,7 +5,7 @@ import { notifyOwner, pushConfigured } from "@/lib/push";
 export async function POST(req: Request) {
   const b = await req.json();
   if (b.test) {
-    if (!pushConfigured()) return NextResponse.json({ error: "Notification keys aren't set up yet." }, { status: 400 });
+    if (!(await pushConfigured())) return NextResponse.json({ error: "Notification keys aren't set up yet." }, { status: 400 });
     await notifyOwner("Test notification", "Notifications are working on this device.", "/admin");
     return NextResponse.json({ ok: true });
   }

@@ -402,3 +402,23 @@ body:has(.shop) { background: var(--bg); }
 .footer-policies p { margin: 0.4rem 0 0.6rem; opacity: 0.85; font-size: 0.92rem; }
 .footer .social a { border-color: color-mix(in srgb, var(--band-ink) 35%, transparent); }
 .fine { max-width: 1200px; margin: 0 auto; padding: 0 16px 1.6rem; font-size: 0.8rem; opacity: 0.7; }
+
+/* ---------- forms, policies, footer links ---------- */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; max-width: 640px; margin-top: 1.5rem; }
+.contact-form .full, .contact-form .btn, .contact-form .error { grid-column: 1 / -1; }
+.contact-form .btn { justify-self: start; }
+.contact-form textarea { font: inherit; font-weight: 400; padding: 0.6rem 0.7rem; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: var(--radius); resize: vertical; }
+@media (max-width: 560px) { .contact-form { grid-template-columns: 1fr; } }
+.form-done { margin-top: 1.5rem; font-weight: 700; }
+.policy { max-width: 720px; padding-top: 2.5rem; }
+.empty-page { padding: 4rem 0; }
+.footer-links { display: grid; gap: 0.35rem; align-content: start; font-weight: 600; }
+.footer-links a { text-decoration: none; opacity: 0.9; }
+.footer-links a:hover { text-decoration: underline; }
+.newsletter { max-width: 320px; display: grid; gap: 0.4rem; }
+.newsletter p { margin: 0; opacity: 0.85; font-size: 0.92rem; }
+.newsletter form { display: flex; gap: 0.4rem; }
+.newsletter input { flex: 1; min-width: 0; font: inherit; padding: 0.45rem 0.6rem; border-radius: var(--radius); border: 1.5px solid color-mix(in srgb, var(--band-ink) 35%, transparent); background: transparent; color: inherit; }
+.newsletter .btn { background: var(--band-ink); color: var(--band); border-color: var(--band-ink); }
+.footer .error { color: inherit; font-weight: 700; }

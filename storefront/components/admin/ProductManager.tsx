@@ -14,7 +14,7 @@ type Draft = Omit<Product, "price" | "compareAtPrice" | "stock" | "id" | "slug" 
   optionValues: string;
 };
 
-const blank: Draft = { name: "", price: "", compareAtPrice: "", summary: "", description: "", category: "", images: [], stock: "", madeToOrder: false, featured: false, active: true, option: null, optionValues: "" };
+const blank: Draft = { stripeProductId: undefined, name: "", price: "", compareAtPrice: "", summary: "", description: "", category: "", images: [], stock: "", madeToOrder: false, featured: false, active: true, option: null, optionValues: "" };
 
 function toDraft(p: Product): Draft {
   return {
@@ -27,8 +27,22 @@ function toDraft(p: Product): Draft {
   };
 }
 
-export function ProductManager({ initial, currency, views, lowAt }: { initial: Product[]; currency: string; views: Record<string, number>; lowAt: number }) {
+export function ProductManager({ initial, currency, views, lowAt, stripeOn, stripeTest }: { initial: Product[]; currency: string; views: Record<string, number>; lowAt: number; stripeOn: boolean; stripeTest: boolean }) {
   const router = useRouter();
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState("");
+  async function syncStripe() {
+    setSyncing(true);
+    setSyncMsg("");
+    try {
+      setSyncMsg((await api<{ message: string }>("/api/admin/stripe", "POST", { action: "sync" })).message);
+      router.refresh();
+      setTimeout(() => window.location.reload(), 600);
+    } catch (e) {
+      setSyncMsg((e as Error).message);
+    }
+    setSyncing(false);
+  }
   const [list, setList] = useState(initial);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
@@ -82,6 +96,12 @@ export function ProductManager({ initial, currency, views, lowAt }: { initial: P
           <h1>{editing.id ? "Edit item" : "New item"}</h1>
           <button className="b b-ghost" onClick={() => setEditing(null)}>Cancel</button>
         </div>
+        {editing.stripeProductId ? (
+          <p className="alert">
+            This item comes from Stripe. Its name, price, description and photos update from Stripe; change them there so they don&apos;t get overwritten.{" "}
+            <a href={`https://dashboard.stripe.com/${stripeTest ? "test/" : ""}products/${editing.stripeProductId}`} target="_blank" rel="noreferrer">Edit in Stripe</a>
+          </p>
+        ) : null}
         <div className="editor">
           <section className="panel stack">
             <label className="f"><span>Name</span><input value={editing.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Challenge Coin Display" /></label>
@@ -124,8 +144,13 @@ export function ProductManager({ initial, currency, views, lowAt }: { initial: P
     <>
       <div className="page-head">
         <h1>Products</h1>
-        <button className="b b-primary" onClick={() => { setErr(""); setEditing({ ...blank }); }}>Add item</button>
+        <div className="row wrap">
+          {stripeOn ? <button className="b" onClick={syncStripe} disabled={syncing}>{syncing ? "Syncing…" : "Sync from Stripe"}</button> : null}
+          {stripeOn ? <a className="b b-ghost" href={`https://dashboard.stripe.com/${stripeTest ? "test/" : ""}products/create`} target="_blank" rel="noreferrer">Add in Stripe</a> : null}
+          <button className="b b-primary" onClick={() => { setErr(""); setEditing({ ...blank }); }}>Add item</button>
+        </div>
       </div>
+      {syncMsg ? <p className="alert" role="status">{syncMsg}</p> : null}
       {list.length > 6 ? <input className="search" placeholder="Search items" value={q} onChange={(e) => setQ(e.target.value)} /> : null}
       {shown.length ? (
         <ul className="plist">
@@ -135,7 +160,7 @@ export function ProductManager({ initial, currency, views, lowAt }: { initial: P
                 <span className="plist-thumb">{/* eslint-disable-next-line @next/next/no-img-element */}{p.images[0] ? <img src={p.images[0]} alt="" /> : null}</span>
                 <span className="plist-name">
                   <strong>{p.name}</strong>
-                  <span className="muted">{[p.category, p.active ? null : "Hidden", p.featured ? "Featured" : null].filter(Boolean).join(" · ")}</span>
+                  <span className="muted">{[p.stripeProductId ? "From Stripe" : null, p.category, p.active ? null : "Hidden", p.featured ? "Featured" : null].filter(Boolean).join(" · ")}</span>
                 </span>
                 <span className="plist-meta">
                   <strong>{money(p.price, currency)}</strong>

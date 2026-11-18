@@ -56,7 +56,7 @@ export function PushToggle({ vapidKey, configured, deviceCount }: { vapidKey: st
     }
   }
 
-  if (!configured) return <p className="muted">Phone alerts need two keys first. Run <code>npm run vapid</code> and add the results to Vercel&apos;s environment variables (see the README). New orders still show under the bell icon.</p>;
+  if (!configured) return <p className="muted">Phone alerts need notification keys first. Open <a href="/admin/keys">Keys</a> and press <strong>Create notification keys</strong>. New orders still show under the bell icon.</p>;
 
   return (
     <div className="stack">

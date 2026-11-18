@@ -1,13 +1,14 @@
 import "server-only";
 import { Redis } from "@upstash/redis";
+import { ensureSupabase, supabase, supabaseConfigured, TABLE } from "./supabase";
 import { promises as fs } from "fs";
 import path from "path";
 
 /**
- * Tiny key/value layer.
- * - On Vercel with Upstash Redis connected: uses Redis (KV_REST_API_URL / KV_REST_API_TOKEN,
- *   or UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN).
- * - Locally with nothing configured: saves to .data/db.json so you can try everything.
+ * Tiny key/value layer. Picks the first one that's set up:
+ * 1. Supabase (default): SUPABASE_URL + SUPABASE_SECRET_KEY, added by Vercel's Supabase integration.
+ * 2. Upstash Redis (optional alternative): KV_REST_API_URL / KV_REST_API_TOKEN.
+ * 3. Neither (your own computer): saves to .data/db.json so you can try everything.
  */
 interface KV {
   get<T>(key: string): Promise<T | null>;
@@ -20,7 +21,31 @@ const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 const PREFIX = "shop:";
 
-export const storageMode: "redis" | "file" = url && token ? "redis" : "file";
+export const storageMode: "supabase" | "redis" | "file" = supabaseConfigured() ? "supabase" : url && token ? "redis" : "file";
+
+function supabaseKV(): KV {
+  const sb = () => ensureSupabase().then(() => supabase());
+  return {
+    async get<T>(k: string) {
+      const { data, error } = await (await sb()).from(TABLE).select("value").eq("key", k).maybeSingle();
+      if (error) throw new Error(error.message);
+      return ((data?.value as T) ?? null) as T | null;
+    },
+    async set<T>(k: string, v: T) {
+      const { error } = await (await sb()).from(TABLE).upsert({ key: k, value: v as unknown, updated_at: new Date().toISOString() });
+      if (error) throw new Error(error.message);
+    },
+    async hincrby(k, f, by) {
+      const { error } = await (await sb()).rpc("shop_hincrby", { p_key: k, p_field: f, p_by: by });
+      if (error) throw new Error(error.message);
+    },
+    async hgetall(k) {
+      const { data, error } = await (await sb()).from(TABLE).select("value").eq("key", k).maybeSingle();
+      if (error) throw new Error(error.message);
+      return Object.fromEntries(Object.entries((data?.value as Record<string, unknown>) ?? {}).map(([a, b]) => [a, Number(b)]));
+    },
+  };
+}
 
 function redisKV(): KV {
   const r = new Redis({ url: url!, token: token! });
@@ -89,4 +114,4 @@ function fileKV(): KV {
   };
 }
 
-export const kv: KV = storageMode === "redis" ? redisKV() : fileKV();
+export const kv: KV = storageMode === "supabase" ? supabaseKV() : storageMode === "redis" ? redisKV() : fileKV();

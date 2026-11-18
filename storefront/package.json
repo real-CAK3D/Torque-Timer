@@ -11,9 +11,11 @@
     "guide": "node --no-warnings scripts/build-guide.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.1",
     "@upstash/redis": "^1.41.0",
     "@vercel/blob": "^2.0.0",
     "next": "15.5.29",
+    "postgres": "^4.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "server-only": "^0.0.1",

@@ -15,6 +15,9 @@ export type Product = {
   featured: boolean;
   active: boolean; // visible to customers
   option?: ProductOption | null;
+  // Set when the item comes from Stripe (Stripe > Product catalog)
+  stripeProductId?: string;
+  stripeStockSeen?: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -40,6 +43,12 @@ export type Order = {
   items: OrderItem[];
   subtotal: number;
   shipping: number;
+  discount?: number;
+  tax?: number;
+  promoCode?: string;
+  trackingNumber?: string;
+  carrier?: string;
+  shippedEmailAt?: string;
   total: number;
   currency: string;
   paymentMethod?: string;
@@ -98,6 +107,11 @@ export type SiteSettings = {
   showVeteranBadge: boolean;
   shippingPolicy: string;
   returnPolicy: string;
+  privacyPolicy: string;
+  termsOfService: string;
+  showContactForm: boolean;
+  showNewsletter: boolean;
+  newsletterText: string;
   // Contact
   contactEmail: string;
   contactPhone: string;
@@ -115,9 +129,23 @@ export type SiteSettings = {
   closedMessage: string;
   lowStockAlert: number;
   shipCountries: string[];
+  allowPromoCodes: boolean;
+  stripeTax: boolean;
+  emailFrom: string; // sender for customer emails, e.g. "My Shop <orders@myshop.com>"
   // Owner tools
   githubRepo: string;
   vercelProject: string;
   customLinks: CustomLink[];
   expenseCategories: string[];
 };
+
+export type Message = {
+  id: string;
+  createdAt: string;
+  name: string;
+  email: string;
+  message: string;
+  read: boolean;
+};
+
+export type Subscriber = { email: string; createdAt: string };

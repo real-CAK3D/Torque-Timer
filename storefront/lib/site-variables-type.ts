@@ -36,9 +36,10 @@ export type SiteVariables = {
   brand: { businessName: string; tagline: string; announcement: string };
   homePage: { headline: string; intro: string; featuredHeading: string; allItemsHeading: string };
   about: { heading: string; story: string; serviceLine: string; showVeteranBadge: boolean };
-  contact: { heading: string; text: string; email: string; phone: string; location: string };
+  contact: { heading: string; text: string; email: string; phone: string; location: string; showContactForm: boolean };
+  newsletter: { show: boolean; text: string };
   social: { facebook: string; instagram: string; tiktok: string; youtube: string; x: string; etsy: string };
-  policies: { shipping: string; returns: string };
+  policies: { shipping: string; returns: string; privacy: string; terms: string };
   images: { logo: string; patch: string; tabIcon: string; welcomePhoto: string; aboutPhoto: string };
   look: { theme: ThemeId; layout: LayoutId };
   store: {
@@ -49,6 +50,9 @@ export type SiteVariables = {
     freeShippingOver: number;
     shipToCountries: string[];
     lowStockAlert: number;
+    allowPromoCodes: boolean;
+    salesTaxByStripe: boolean;
+    emailFrom: string;
   };
   owner: {
     expenseCategories: string[];

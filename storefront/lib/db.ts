@@ -1,7 +1,7 @@
 import "server-only";
 import { kv } from "./store";
 import { fileSettings, syncVariables } from "./sync";
-import type { AppNotification, Expense, Order, Product, SiteSettings } from "./types";
+import type { AppNotification, Expense, Message, Order, Product, SiteSettings, Subscriber } from "./types";
 
 // Starting values come from site-variables.ts (the SITE-VARIABLES edit point).
 export const DEFAULT_SETTINGS: SiteSettings = fileSettings();
@@ -107,4 +107,18 @@ export async function getPushSubs(): Promise<PushSub[]> {
 }
 export async function savePushSubs(list: PushSub[]) {
   await kv.set("pushSubs", list);
+}
+
+// ---------- inbox & email list ----------
+export async function getMessages(): Promise<Message[]> {
+  return (await kv.get<Message[]>("messages")) ?? [];
+}
+export async function saveMessages(list: Message[]) {
+  await kv.set("messages", list.slice(0, 1000));
+}
+export async function getSubscribers(): Promise<Subscriber[]> {
+  return (await kv.get<Subscriber[]>("subscribers")) ?? [];
+}
+export async function saveSubscribers(list: Subscriber[]) {
+  await kv.set("subscribers", list);
 }

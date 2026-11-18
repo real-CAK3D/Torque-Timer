@@ -19,6 +19,10 @@ export default async function Money({ searchParams }: { searchParams: Promise<{ 
     <>
       <div className="page-head">
         <h1>Income & expenses</h1>
+        <div className="row wrap">
+          <a className="b b-ghost b-sm" href="/api/admin/export?type=orders">Sales spreadsheet</a>
+          <a className="b b-ghost b-sm" href="/api/admin/export?type=expenses">Expenses spreadsheet</a>
+        </div>
         <RangePicker base="/admin/money" current={days} />
       </div>
       <div className="tiles">

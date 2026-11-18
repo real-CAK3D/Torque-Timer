@@ -2,11 +2,15 @@ import { NextResponse } from "next/server";
 import { getOrders, saveOrders } from "@/lib/db";
 import { recordOrderFromSession } from "@/lib/orders";
 import { notifyOwner } from "@/lib/push";
+import { getKey } from "@/lib/keys";
 import { stripe } from "@/lib/stripe";
+import { syncStripeProduct } from "@/lib/stripe-catalog";
 
+// Stripe calls this address when someone pays, a refund happens, or a product changes.
+// The events it listens for are listed in WEBHOOK_EVENTS (lib/stripe.ts).
 export async function POST(req: Request) {
-  const s = stripe();
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  const s = await stripe();
+  const secret = await getKey("STRIPE_WEBHOOK_SECRET");
   if (!s || !secret) return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
 
   const body = await req.text();
@@ -33,6 +37,16 @@ export async function POST(req: Request) {
         await notifyOwner(`Order #${o.number} refunded`, `${o.name || o.email}`, `/admin/orders?open=${o.id}`);
       }
     }
+  }
+  if (event.type === "product.created" || event.type === "product.updated") {
+    await syncStripeProduct(event.data.object.id);
+  }
+  if (event.type === "product.deleted") {
+    await syncStripeProduct(event.data.object.id, true);
+  }
+  if (event.type === "price.created" || event.type === "price.updated") {
+    const product = event.data.object.product;
+    await syncStripeProduct(typeof product === "string" ? product : product.id);
   }
   return NextResponse.json({ received: true });
 }

@@ -8,7 +8,7 @@ import type { OrderItem } from "./types";
 
 /** Turn a paid Stripe Checkout session into an order. Safe to call more than once. */
 export async function recordOrderFromSession(sessionId: string) {
-  const s = stripe();
+  const s = await stripe();
   if (!s) return null;
   const session = await s.checkout.sessions.retrieve(sessionId, {
     expand: ["line_items.data.price.product", "payment_intent.payment_method"],
@@ -17,22 +17,38 @@ export async function recordOrderFromSession(sessionId: string) {
 
   const items: OrderItem[] = [];
   let shipping = 0;
+  let cart: [string, string][] = [];
+  try {
+    cart = JSON.parse(session.metadata?.cart ?? "[]");
+  } catch {}
+  const catalog = await getProducts();
+  let lineIndex = 0;
   for (const li of session.line_items?.data ?? []) {
     const product = li.price?.product as Stripe.Product | undefined;
     const meta = product?.metadata ?? {};
+    const fromCart = cart[lineIndex++] ?? [];
+    const appProduct =
+      catalog.find((p) => p.id === (meta.productId || fromCart[0])) ?? catalog.find((p) => product && p.stripeProductId === product.id);
     if (meta.kind === "shipping") {
       shipping += li.amount_total;
       continue;
     }
     items.push({
-      productId: meta.productId ?? "",
+      productId: appProduct?.id ?? meta.productId ?? "",
       name: product?.name ?? li.description ?? "Item",
-      option: meta.option || undefined,
+      option: meta.option || fromCart[1] || undefined,
       quantity: li.quantity ?? 1,
       unitAmount: li.price?.unit_amount ?? 0,
     });
   }
   shipping += session.shipping_cost?.amount_total ?? 0;
+  let promoCode: string | undefined;
+  const disc = session.discounts?.[0]?.promotion_code;
+  if (disc) {
+    try {
+      promoCode = typeof disc === "string" ? (await s.promotionCodes.retrieve(disc)).code : disc.code;
+    } catch {}
+  }
 
   const ship = session.collected_information?.shipping_details ?? null;
   const addr = ship?.address ?? session.customer_details?.address ?? null;
@@ -57,6 +73,9 @@ export async function recordOrderFromSession(sessionId: string) {
     items,
     subtotal: session.amount_subtotal ?? 0,
     shipping,
+    discount: session.total_details?.amount_discount || undefined,
+    tax: session.total_details?.amount_tax || undefined,
+    promoCode,
     total: session.amount_total ?? 0,
     currency: session.currency ?? "usd",
     paymentMethod: paymentMethod ?? undefined,

@@ -1,9 +1,13 @@
 import "server-only";
 import webpush from "web-push";
 import { getNotifications, getPushSubs, newId, saveNotifications, savePushSubs } from "./db";
+import { getKey } from "./keys";
 
-export const pushConfigured = () =>
-  Boolean(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY);
+export async function vapidKeys() {
+  const [pub, priv] = await Promise.all([getKey("NEXT_PUBLIC_VAPID_PUBLIC_KEY"), getKey("VAPID_PRIVATE_KEY")]);
+  return pub && priv ? { pub, priv } : null;
+}
+export const pushConfigured = async () => Boolean(await vapidKeys());
 
 /** Saves an in-app notification and pushes it to every phone/computer that turned notifications on. */
 export async function notifyOwner(title: string, body: string, url = "/admin") {
@@ -11,12 +15,9 @@ export async function notifyOwner(title: string, body: string, url = "/admin") {
   list.unshift({ id: newId(), createdAt: new Date().toISOString(), title, body, url, read: false });
   await saveNotifications(list);
 
-  if (!pushConfigured()) return;
-  webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT || "mailto:owner@example.com",
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!
-  );
+  const keys = await vapidKeys();
+  if (!keys) return;
+  webpush.setVapidDetails(process.env.VAPID_SUBJECT || "mailto:owner@example.com", keys.pub, keys.priv);
   const subs = await getPushSubs();
   const dead: string[] = [];
   await Promise.all(

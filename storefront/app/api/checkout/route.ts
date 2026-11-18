@@ -6,7 +6,7 @@ import { siteUrl, stripe } from "@/lib/stripe";
 type CartLine = { productId: string; quantity: number; option?: string };
 
 export async function POST(req: Request) {
-  const s = stripe();
+  const s = await stripe();
   if (!s) return NextResponse.json({ error: "Online checkout isn't switched on yet. Please check back soon." }, { status: 503 });
 
   const { items } = (await req.json().catch(() => ({ items: [] }))) as { items: CartLine[] };
@@ -15,6 +15,7 @@ export async function POST(req: Request) {
 
   const lines: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
   let subtotal = 0;
+  const cart: [string, string][] = []; // [productId, choice] per line, so orders map back to items
   for (const it of Array.isArray(items) ? items.slice(0, 50) : []) {
     const p = products.find((x) => x.id === it.productId);
     if (!p) continue;
@@ -27,18 +28,25 @@ export async function POST(req: Request) {
       .slice(0, 1)
       .map((u) => (u.startsWith("http") ? u : siteUrl(req) + u))
       .filter((u) => u.startsWith("https://"));
+    cart.push([p.id, option]);
+    const tax = settings.stripeTax ? { tax_behavior: "exclusive" as const } : {};
     lines.push({
       quantity: qty,
-      price_data: {
-        currency: settings.currency,
-        unit_amount: p.price,
-        product_data: {
-          name: option ? `${p.name} (${option})` : p.name,
-          description: p.summary || undefined,
-          images: absImages.length ? absImages : undefined,
-          metadata: { productId: p.id, option },
-        },
-      },
+      price_data:
+        p.stripeProductId && !option
+          ? // Items made in Stripe are charged against that Stripe product, so Stripe's reports line up.
+            { currency: settings.currency, unit_amount: p.price, product: p.stripeProductId, ...tax }
+          : {
+              currency: settings.currency,
+              unit_amount: p.price,
+              ...tax,
+              product_data: {
+                name: option ? `${p.name} (${option})` : p.name,
+                description: p.summary || undefined,
+                images: absImages.length ? absImages : undefined,
+                metadata: { productId: p.id, option },
+              },
+            },
     });
   }
   if (!lines.length) return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
@@ -67,12 +75,18 @@ export async function POST(req: Request) {
                   type: "fixed_amount",
                   display_name: freeShip ? "Free shipping" : "Standard shipping",
                   fixed_amount: { amount: shippingAmount, currency: settings.currency },
+                  ...(settings.stripeTax ? { tax_behavior: "exclusive" as const } : {}),
                 },
               },
             ],
           }
         : {}),
       phone_number_collection: { enabled: true },
+      // Lets customers type a promotion code made in Stripe (Product catalog > Coupons).
+      allow_promotion_codes: settings.allowPromoCodes || undefined,
+      // Sales tax worked out by Stripe Tax (turn on in Stripe first: Settings > Tax).
+      ...(settings.stripeTax ? { automatic_tax: { enabled: true } } : {}),
+      metadata: { cart: JSON.stringify(cart).slice(0, 499) },
       success_url: `${base}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${base}/cart`,
     });

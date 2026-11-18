@@ -1,11 +1,15 @@
 import "server-only";
 import Stripe from "stripe";
+import { getKey } from "./keys";
 
-let client: Stripe | null = null;
-export function stripe(): Stripe | null {
-  if (!process.env.STRIPE_SECRET_KEY) return null;
-  client ??= new Stripe(process.env.STRIPE_SECRET_KEY);
-  return client;
+let client: { key: string; s: Stripe } | null = null;
+
+/** Stripe client using the key from Vercel or the dashboard's Keys page. null if no key yet. */
+export async function stripe(): Promise<Stripe | null> {
+  const key = await getKey("STRIPE_SECRET_KEY");
+  if (!key) return null;
+  if (client?.key !== key) client = { key, s: new Stripe(key) };
+  return client.s;
 }
 
 export function siteUrl(req?: Request) {
@@ -19,3 +23,15 @@ export function siteUrl(req?: Request) {
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   return "http://localhost:3000";
 }
+
+/** Events the webhook listens for. Keep in sync with app/api/stripe/webhook/route.ts. */
+export const WEBHOOK_EVENTS: Stripe.WebhookEndpointCreateParams.EnabledEvent[] = [
+  "checkout.session.completed",
+  "checkout.session.async_payment_succeeded",
+  "charge.refunded",
+  "product.created",
+  "product.updated",
+  "product.deleted",
+  "price.created",
+  "price.updated",
+];

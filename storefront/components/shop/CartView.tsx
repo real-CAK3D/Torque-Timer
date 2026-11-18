@@ -4,7 +4,7 @@ import { useState } from "react";
 import { money } from "@/lib/format";
 import { useCart } from "./CartProvider";
 
-export function CartView(props: { currency: string; shippingFlat: number; freeOver: number; storeOpen: boolean; closedMessage: string }) {
+export function CartView(props: { currency: string; shippingFlat: number; freeOver: number; storeOpen: boolean; closedMessage: string; promoCodes: boolean; tax: boolean }) {
   const cart = useCart();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -86,7 +86,11 @@ export function CartView(props: { currency: string; shippingFlat: number; freeOv
         ) : (
           <p>{props.closedMessage}</p>
         )}
-        <p className="pay-note">Pay with card, Apple Pay or Google Pay on Stripe&apos;s secure page.</p>
+        <p className="pay-note">
+          Pay with card, Apple Pay or Google Pay on Stripe&apos;s secure page.
+          {props.promoCodes ? " Have a promo code? Enter it there." : ""}
+          {props.tax ? " Sales tax is added at checkout." : ""}
+        </p>
         {error ? <p className="error" role="alert">{error}</p> : null}
       </aside>
     </div>

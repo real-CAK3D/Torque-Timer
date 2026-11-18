@@ -45,6 +45,10 @@ export function ContentForm({ initial }: { initial: SiteSettings }) {
           <h2>Policies</h2>
           {text("shippingPolicy", "Shipping", { rows: 3 })}
           {text("returnPolicy", "Returns", { rows: 3 })}
+          {text("privacyPolicy", "Privacy policy", { rows: 6, hint: "Shown at /policies/privacy. {business} and {email} fill in automatically. A starting point, not legal advice." })}
+          {text("termsOfService", "Terms of sale", { rows: 6, hint: "Shown at /policies/terms." })}
+          <h2>Email sign-up</h2>
+          {text("newsletterText", "Text next to the sign-up box", { hint: "Turn the box on or off in Settings." })}
         </section>
         <section className="panel stack">
           <h2>Logos & photos</h2>

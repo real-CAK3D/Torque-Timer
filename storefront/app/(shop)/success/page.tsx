@@ -31,6 +31,9 @@ export default async function Success({ searchParams }: { searchParams: Promise<
                 <span>{money(i.unitAmount * i.quantity, order!.currency)}</span>
               </li>
             ))}
+            {order.discount ? <li><span>Discount{order.promoCode ? ` (${order.promoCode})` : ""}</span><span>−{money(order.discount, order.currency)}</span></li> : null}
+            {order.shipping ? <li><span>Shipping</span><span>{money(order.shipping, order.currency)}</span></li> : null}
+            {order.tax ? <li><span>Tax</span><span>{money(order.tax, order.currency)}</span></li> : null}
             <li className="total"><span>Total paid</span><span>{money(order.total, order.currency)}</span></li>
           </ul>
         </>

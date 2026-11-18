@@ -8,7 +8,7 @@ export default async function CartPage() {
   return (
     <section className="section cart">
       <h1>Your cart</h1>
-      <CartView currency={s.currency} shippingFlat={s.collectShipping ? s.shippingFlat : 0} freeOver={s.freeShippingOver} storeOpen={s.storeOpen} closedMessage={s.closedMessage} />
+      <CartView currency={s.currency} shippingFlat={s.collectShipping ? s.shippingFlat : 0} freeOver={s.freeShippingOver} storeOpen={s.storeOpen} closedMessage={s.closedMessage} promoCodes={s.allowPromoCodes} tax={s.stripeTax} />
     </section>
   );
 }

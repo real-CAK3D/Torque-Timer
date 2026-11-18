@@ -83,6 +83,13 @@ export const SITE_VARIABLES = {
     email: "", // public email; "" hides it
     phone: "", // public phone; "" hides it
     location: "", // e.g. "Fort Leonard Wood, MO"
+    showContactForm: true, // a message form customers can fill in; messages land in the dashboard Inbox
+  },
+
+  // ----------------------------------------------------------- NEWSLETTER
+  newsletter: {
+    show: true, // email sign-up box in the footer; the list is under Customers in the dashboard
+    text: "New items and restocks, a few times a year. No spam.",
   },
 
   // --------------------------------------------------------------- SOCIAL
@@ -101,6 +108,12 @@ export const SITE_VARIABLES = {
     shipping:
       "Orders ship within 3-5 business days. Made-to-order items may take a little longer; you'll get an email when yours ships.",
     returns: "If something isn't right, reach out within 30 days and we'll make it right.",
+    // Shown at /policies/privacy and /policies/terms, linked in the footer. These are plain starting
+    // points, not legal advice. {business} and {email} are filled in automatically.
+    privacy:
+      "{business} collects only what's needed to fill your order: your name, email, phone number and shipping address. Payments are handled by Stripe; we never see or store your card number.\n\nWe use your details to ship your order and contact you about it. If you sign up for updates, we email you about new items, and you can ask to be removed at any time.\n\nWe don't sell or share your information, except with the services that make the shop work (Stripe for payments, our web host, and shipping carriers).\n\nThe site uses one small cookie to count daily visitors. It contains no personal information.\n\nTo see, change or delete your information, email {email}.",
+    terms:
+      "By ordering from {business} you agree to these terms.\n\nPrices are in US dollars and can change at any time. Your order is confirmed when payment goes through, and you'll get a receipt by email.\n\nHandmade items vary a little from piece to piece, and that's part of their character. Photos are as accurate as we can make them.\n\nShipping times are estimates. Once a package is with the carrier, delivery is up to them, but we'll help sort out any problem.\n\nSee our shipping and returns policies for the rest. Questions: {email}.",
   },
 
   // --------------------------------------------------------------- IMAGES
@@ -129,6 +142,9 @@ export const SITE_VARIABLES = {
     freeShippingOver: 75, // orders this big ship free; 0 = never free
     shipToCountries: ["US", "CA"], // two-letter country codes
     lowStockAlert: 2, // phone alert when an item gets down to this many
+    allowPromoCodes: true, // lets customers type a coupon code made in Stripe (Product catalog > Coupons)
+    salesTaxByStripe: false, // true adds sales tax at checkout; turn on Stripe Tax first (Stripe > Settings > Tax)
+    emailFrom: "", // sender for tracking emails, e.g. "Your Shop <orders@yourshop.com>"; needs a Resend key and verified domain
   },
 
   // ---------------------------------------------------- OWNER (not public)

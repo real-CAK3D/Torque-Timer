@@ -1,26 +1,7 @@
 "use client";
-import { Fragment, useEffect, useMemo, useState } from "react";
-import { HELP, type HelpBlock, type HelpTopic } from "@/lib/help";
-
-/** Renders **bold** and `code` without injecting HTML. */
-function Rich({ text }: { text: string }) {
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
-  return (
-    <>
-      {parts.map((p, i) =>
-        p.startsWith("**") ? <strong key={i}>{p.slice(2, -2)}</strong> : p.startsWith("`") ? <code key={i}>{p.slice(1, -1)}</code> : <Fragment key={i}>{p}</Fragment>
-      )}
-    </>
-  );
-}
-
-function Block({ b }: { b: HelpBlock }) {
-  if ("p" in b) return <p><Rich text={b.p} /></p>;
-  if ("h" in b) return <h3>{b.h}</h3>;
-  if ("tip" in b) return <p className="help-tip"><Rich text={b.tip} /></p>;
-  if ("list" in b) return <ul>{b.list.map((x, i) => <li key={i}><Rich text={x} /></li>)}</ul>;
-  return <ol>{b.steps.map((x, i) => <li key={i}><Rich text={x} /></li>)}</ol>;
-}
+import { useEffect, useMemo, useState } from "react";
+import { HELP, type HelpTopic } from "@/lib/help";
+import { Block } from "./HelpBlocks";
 
 const text = (t: HelpTopic) =>
   [t.title, t.summary, ...t.blocks.map((b) => ("p" in b ? b.p : "h" in b ? b.h : "tip" in b ? b.tip : "list" in b ? b.list.join(" ") : b.steps.join(" ")))].join(" ").toLowerCase();

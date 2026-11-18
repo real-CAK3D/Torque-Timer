@@ -1,24 +1,21 @@
 import Link from "next/link";
-import { storageMode } from "@/lib/store";
-import { blobConfigured } from "@/lib/upload";
-import { pushConfigured } from "@/lib/push";
+import { SETUP_STEPS } from "@/lib/setup-steps";
+import { getStatus } from "@/lib/status";
 
-export function SetupChecklist() {
-  const items = [
-    { ok: Boolean(process.env.STRIPE_SECRET_KEY), label: "Connect Stripe so customers can pay" },
-    { ok: Boolean(process.env.STRIPE_WEBHOOK_SECRET), label: "Add the Stripe webhook so orders arrive instantly" },
-    { ok: storageMode === "redis", label: "Connect Upstash Redis so your changes are saved" },
-    { ok: blobConfigured(), label: "Connect Vercel Blob so you can upload photos" },
-    { ok: pushConfigured(), label: "Add notification keys for phone alerts" },
-  ];
-  const todo = items.filter((i) => !i.ok);
+/** "Finish setting up" box on the dashboard. Disappears when every required step is done. */
+export async function SetupChecklist() {
+  const st = await getStatus();
+  const steps = SETUP_STEPS.filter((s) => s.check && !s.optional);
+  const todo = steps.filter((s) => !st[s.check!].ok);
   if (!todo.length) return null;
   return (
     <section className="panel setup">
-      <div className="panel-head"><h2>Finish setting up</h2><Link href="/admin/settings">Open settings</Link></div>
+      <div className="panel-head"><h2>Finish setting up ({steps.length - todo.length} of {steps.length})</h2><Link href="/admin/setup">Open setup guide</Link></div>
       <ul className="checks">
-        {items.map((i) => (
-          <li key={i.label} className={i.ok ? "done" : ""}>{i.label}</li>
+        {steps.map((s) => (
+          <li key={s.id} className={st[s.check!].ok ? "done" : ""}>
+            <Link href={`/admin/setup#${s.id}`}>{s.title}</Link>
+          </li>
         ))}
       </ul>
     </section>
