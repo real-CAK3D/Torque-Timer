@@ -64,6 +64,7 @@ Find one by searching the repository for `EDIT-POINT: NAME` (on GitHub press `/`
 | `ADMIN-MENU` | `components/admin/AdminNav.tsx` | Owner dashboard menu |
 | `APP-ICON` | `app/api/manifest/route.ts` | Home-screen app name and icon |
 | `LOGIN` | `lib/auth.ts` | How long the owner stays logged in |
+| `HELP` | `lib/help.ts` | The Help page and GUIDE.md (run `npm run guide` after editing) |
 
 ### Getting ChatGPT to help with a code change
 

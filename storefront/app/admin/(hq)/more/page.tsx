@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/admin/content", label: "Words & logos", note: "Business name, about, logos, photos" },
   { href: "/admin/appearance", label: "Look & layout", note: "Themes and page styles" },
   { href: "/admin/notifications", label: "Notifications", note: "Orders and alerts" },
+  { href: "/admin/help", label: "Help", note: "How every part of the site works" },
   { href: "/admin/settings", label: "Settings", note: "Payments, shipping, linked accounts" },
 ];
 

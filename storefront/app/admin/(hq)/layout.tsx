@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { HelpButton } from "@/components/admin/HelpButton";
 import { RegisterSW } from "@/components/admin/RegisterSW";
 import { getNotifications, getSettings } from "@/lib/db";
 
@@ -16,6 +17,7 @@ export default async function HQLayout({ children }: { children: React.ReactNode
         </Link>
         <div className="hq-top-actions">
           <a href="/" target="_blank" rel="noreferrer" className="b b-ghost b-sm">View site</a>
+          <HelpButton />
           <Link href="/admin/notifications" className="bell" aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
               <path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8" />

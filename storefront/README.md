@@ -1,5 +1,7 @@
 # Veteran-owned storefront + Shop HQ
 
+> **New here? Read [GUIDE.md](GUIDE.md)**: a plain-English tour of every part of the site. The same guide is inside the dashboard under the **?** icon.
+
 An online shop with a private owner dashboard. Customers browse products and pay with card, **Apple Pay** or **Google Pay** through Stripe. The owner logs in at `/admin` (installable on an iPhone home screen) to manage products, photos, words, themes, orders, customers, income and expenses, and gets a phone notification for every new order.
 
 Customers never see the dashboard. Nothing on the shop links to it, every `/admin` page and admin API requires the owner login, and the pages are marked `noindex`.

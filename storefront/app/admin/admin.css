@@ -316,3 +316,20 @@ body:has(.hq) { background: #F2F3EF; }
 .login-card form { text-align: left; margin-top: 0.6rem; }
 .login-mark { color: var(--accent); }
 
+
+/* help */
+.help-group { display: grid; gap: 0.6rem; }
+.help-group > h2 { margin-top: 0.6rem; color: var(--muted); font-size: 0.9rem; }
+.help-topic { padding: 0; scroll-margin-top: 80px; }
+.help-topic > summary { list-style: none; cursor: pointer; padding: 0.9rem 1.2rem; display: grid; gap: 0.1rem; position: relative; padding-right: 2.6rem; }
+.help-topic > summary::-webkit-details-marker { display: none; }
+.help-topic > summary::after { content: "+"; position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: var(--muted); }
+.help-topic[open] > summary::after { content: "−"; }
+.help-topic[open] { border-color: var(--accent); }
+.help-body { padding: 0 1.2rem 1rem; border-top: 1px solid var(--line); }
+.help-body > * { max-width: 75ch; }
+.help-body p, .help-body ul, .help-body ol { margin: 0.8rem 0 0; }
+.help-body ul, .help-body ol { padding-left: 1.3rem; display: grid; gap: 0.35rem; }
+.help-body h3 { margin: 1.1rem 0 0; }
+.help-tip { background: color-mix(in srgb, var(--gold) 14%, transparent); border-left: 3px solid var(--gold); padding: 0.6rem 0.8rem; border-radius: 6px; }
+.help-tip::before { content: "Tip: "; font-weight: 700; }
