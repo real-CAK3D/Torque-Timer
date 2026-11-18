@@ -2,6 +2,12 @@ import "server-only";
 import { kv } from "./store";
 import type { AppNotification, Expense, Order, Product, SiteSettings } from "./types";
 
+/* ========================================================================
+ * EDIT-POINT: DEFAULT-TEXT
+ * Starting words and settings for a brand-new site (before the owner edits
+ * anything). Once the owner saves in the dashboard, the saved values win.
+ * New settings must also be added to SiteSettings in lib/types.ts.
+ * ======================================================================== */
 export const DEFAULT_SETTINGS: SiteSettings = {
   businessName: "Your Business Name",
   tagline: "Veteran-owned. Handmade with discipline.",
@@ -41,6 +47,11 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 
 const now = () => new Date().toISOString();
 
+/* ========================================================================
+ * EDIT-POINT: SAMPLE-PRODUCTS
+ * Demo items that appear the first time the site runs. Prices are in CENTS
+ * (6500 = $65.00). Delete them from the dashboard, or empty this list.
+ * ======================================================================== */
 const SAMPLE_PRODUCTS: Product[] = [
   {
     id: "sample-1",

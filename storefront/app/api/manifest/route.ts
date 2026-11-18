@@ -5,6 +5,12 @@ import { getTheme } from "@/lib/themes";
 export async function GET() {
   const s = await getSettings();
   const t = getTheme(s.theme);
+  /* ========================================================================
+   * EDIT-POINT: APP-ICON
+   * How the dashboard installs on a phone home screen (name, colors, icons).
+   * Replace the PNGs in public/icons/ (192, 512 and apple-touch-icon 180 px)
+   * to change the app icon.
+   * ======================================================================== */
   const manifest = {
     name: `${s.businessName} HQ`,
     short_name: "Shop HQ",

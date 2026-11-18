@@ -1,4 +1,9 @@
 // Built-in badge used until a logo is uploaded. Colors follow the active theme.
+/* ========================================================================
+ * EDIT-POINT: EMBLEM
+ * The built-in shield badge shown until a logo is uploaded. It's an SVG
+ * drawing; colors come from the active theme.
+ * ======================================================================== */
 export function Emblem({ initials, size = 96 }: { initials: string; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 120 120" role="img" aria-label={`${initials} emblem`} className="emblem">

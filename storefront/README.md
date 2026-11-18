@@ -16,6 +16,7 @@ Customers never see the dashboard. Nothing on the shop links to it, every `/admi
 | **Customers** | Everyone who ordered, how often and how much |
 | **Words & logos** | Business name, headline, about story, service line, veteran badge, policies, contact, social links, logo / patch / tab icon / photos |
 | **Look & layout** | Pick a theme and layout with a live preview before saving |
+| **ChatGPT helper** | Copy the shop to ChatGPT, describe a change, paste the reply back, preview old → new, apply, undo. See `CUSTOMIZE.md` |
 | **Settings** | Open/close the shop, shipping prices, low-stock alerts, phone notifications, links and status for Stripe, Apple Pay, Google Pay, GitHub, Vercel, storage, plus your own shortcut links |
 
 **Themes:** Military Police (MP green & gold, black brassard band), Olive Drab, OCP Field, Dress Blues, Night Patrol (dark), Old Glory, Brass & Leather, Clean Dispatch.
@@ -69,6 +70,9 @@ npm run dev
 ```
 
 Open http://localhost:3000 for the shop and http://localhost:3000/admin for the dashboard (password `changeme` locally unless `ADMIN_PASSWORD` is set). Without Redis/Blob configured, data is saved to `.data/db.json` and images to `public/uploads/`. Both are git-ignored.
+
+## Changing things later
+See **[CUSTOMIZE.md](CUSTOMIZE.md)**: the ChatGPT helper for everyday changes, and the `EDIT-POINT` markers (`npm run edit-points`) for code changes.
 
 ## How it's built
 - Next.js 15 (App Router) + TypeScript, no CSS framework. Themes are CSS variables in `lib/themes.ts`; add a theme by adding an entry there.

@@ -5,6 +5,11 @@ import { money, shortDate, toCents } from "@/lib/format";
 import type { Expense } from "@/lib/types";
 import { api } from "./api";
 
+/* ========================================================================
+ * EDIT-POINT: EXPENSE-CATEGORIES
+ * Categories in the expense dropdown on the Money page. Also update the list
+ * in EXPENSE_VARS (lib/variables.ts) so ChatGPT uses the same names.
+ * ======================================================================== */
 const CATS = ["Materials", "Tools", "Shipping supplies", "Postage", "Fees", "Marketing", "Software", "Other"];
 
 export function ExpenseManager({ initial, currency }: { initial: Expense[]; currency: string }) {

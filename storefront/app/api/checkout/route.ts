@@ -48,12 +48,22 @@ export async function POST(req: Request) {
   const base = siteUrl(req);
 
   try {
+    /* ========================================================================
+     * EDIT-POINT: CHECKOUT
+     * Stripe Checkout options. Card, Apple Pay, Google Pay and Link are turned
+     * on in the Stripe dashboard (Settings > Payment methods), not here.
+     * Other options: https://docs.stripe.com/api/checkout/sessions/create
+     * ======================================================================== */
     const session = await s.checkout.sessions.create({
       mode: "payment",
       line_items: lines,
       // Card, Apple Pay, Google Pay and Link show up automatically based on your Stripe dashboard settings.
       ...(settings.collectShipping
         ? {
+            /* ========================================================================
+             * EDIT-POINT: SHIPPING-COUNTRIES
+             * Countries you ship to, as two-letter codes ("US", "CA", "GB", ...).
+             * ======================================================================== */
             shipping_address_collection: { allowed_countries: ["US", "CA"] },
             shipping_options: [
               {

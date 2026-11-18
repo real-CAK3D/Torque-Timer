@@ -39,6 +39,11 @@ export function Contact({ s }: { s: SiteSettings }) {
   if (!any) return null;
   return (
     <section id="contact" className="section contact">
+      {/* ========================================================================
+          EDIT-POINT: HOME-PAGE-SECTIONS
+          Fixed wording for the veteran badge, About and Contact sections used by
+          every layout. Most text comes from the dashboard; these headings don't.
+          ======================================================================== */}
       <h2>Get in touch</h2>
       <p className="muted">Custom orders, questions or a status check on your order.</p>
       <ul className="contact-list">

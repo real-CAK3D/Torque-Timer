@@ -29,6 +29,10 @@ export function Footer({ s }: { s: SiteSettings }) {
         </div>
         <Social links={s.social} />
       </div>
+      {/* ========================================================================
+          EDIT-POINT: FOOTER
+          Small print at the very bottom of every shop page.
+          ======================================================================== */}
       <p className="fine">
         © {new Date().getFullYear()} {s.businessName}. Secure checkout by Stripe. Apple Pay and Google Pay accepted.
       </p>

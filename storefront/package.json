@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "vapid": "node scripts/generate-vapid.mjs"
+    "vapid": "node scripts/generate-vapid.mjs",
+    "edit-points": "node scripts/edit-points.mjs"
   },
   "dependencies": {
     "@upstash/redis": "^1.41.0",
