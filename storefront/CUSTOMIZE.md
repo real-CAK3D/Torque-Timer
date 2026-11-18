@@ -75,7 +75,7 @@ Find one by searching the repository for `EDIT-POINT: NAME` (on GitHub press `/`
 ### Getting ChatGPT to help with a code change
 
 1. Open the file on GitHub and find the `EDIT-POINT` block.
-2. Copy the code under it into ChatGPT: *"Here is the NAV-LINKS section of my site. Add a link called Custom Orders that goes to /#contact. Give me the full replacement."*
+2. Copy the code under it into ChatGPT: *"Here is the NAV-LINKS section of my site. Add a link called Custom Orders that goes to /contact. Give me the full replacement."*
 3. On GitHub, click the pencil, swap in the new code, and click **Commit changes**. Vercel rebuilds automatically.
 
 Passwords and keys never go in any file. They live in Vercel > Settings > Environment Variables.
