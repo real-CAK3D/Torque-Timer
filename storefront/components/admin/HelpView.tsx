@@ -10,7 +10,7 @@ export function HelpView({ guideUrl }: { guideUrl: string }) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<string>("");
 
-  // Open the topic named in the address (#orders etc.), and follow later changes.
+  // open the topic in the URL hash (the ? button links to /admin/help#orders etc.)
   useEffect(() => {
     const go = () => {
       const id = decodeURIComponent(location.hash.slice(1));

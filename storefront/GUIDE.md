@@ -2,7 +2,7 @@
 
 <!-- Generated from lib/help.ts by `npm run guide`. Edit that file, not this one. -->
 
-Everything the site does and how to use it. The same guide is inside the dashboard: tap the **?** icon at the top of any page.
+How each part of the site works. The same guide is in the dashboard under the ? button.
 
 ## Contents
 
@@ -15,7 +15,7 @@ Everything the site does and how to use it. The same guide is inside the dashboa
 
 **Dashboard pages**
 
-- [Dashboard](#dashboard): Your sales, orders, profit and visitors at a glance.
+- [Dashboard](#dashboard): Sales, orders, profit and visitors.
 - [Orders](#orders): Every paid order, where to ship it, and its status.
 - [Products](#products): Add, edit, hide and price your items.
 - [Money (income & expenses)](#money): What came in, what went out, and what you kept.
@@ -56,7 +56,7 @@ Your site has two sides:
 - **The shop** (your web address, e.g. `yourshop.com`). What customers see: your items, your story and the checkout.
 - **The dashboard** (`yourshop.com/admin`). Only you can get in, with your password. Customers never see it and nothing on the shop links to it.
 
-Behind the scenes, a few services do the heavy lifting:
+It runs on a few outside services:
 
 - **Stripe** takes payments (card, Apple Pay, Google Pay) and sends the money to your bank.
 - **GitHub** stores the site's files, including `site-variables.ts`, the one file with all your words, prices and products.
@@ -110,7 +110,7 @@ _Make the site yours before sharing the link._
 <a id="dashboard"></a>
 ### Dashboard
 
-_Your sales, orders, profit and visitors at a glance._
+_Sales, orders, profit and visitors._
 
 Pick **7 days**, **30 days**, **90 days** or **1 yr** at the top to change the time period for everything on the page.
 
@@ -134,7 +134,7 @@ Orders show up here automatically when a customer pays. Tap one to open it.
 
 - **Items**, **shipping cost** and how they paid (Apple Pay, Google Pay or card).
 - **Ship to**: the customer's name and address. Tap their email or phone to contact them.
-- **Status**: **To ship** → **Shipped** → **Delivered**. Mark **Refunded** or **Cancelled** if needed. Refunds made in Stripe update here on their own.
+- **Status**: **To ship**, then **Shipped**, then **Delivered**. Mark **Refunded** or **Cancelled** if needed. Refunds made in Stripe update here on their own.
 - **Private note**: tracking numbers, engraving text, anything to remember. Customers never see it. It saves when you tap outside the box.
 - **Open in Stripe**: the payment in your Stripe account, where you can issue a refund.
 
@@ -146,7 +146,7 @@ Orders show up here automatically when a customer pays. Tap one to open it.
 
 The filter buttons at the top show only orders waiting to ship, shipped, or delivered. **Download spreadsheet** saves every order for your records or taxes. Discounts, promo codes and sales tax show on each order when used.
 
-> **Tip:** Customers get their payment receipt from Stripe (turn it on in Stripe → Settings → Customer emails). Changing a status by itself doesn't email anyone; the ship button does.
+> **Tip:** Customers get their payment receipt from Stripe (turn it on in Stripe > Settings > Customer emails). Changing a status by itself doesn't email anyone; the ship button does.
 
 <a id="products"></a>
 ### Products
@@ -261,7 +261,7 @@ An API key is a long password that lets the shop talk to another service. Paste 
 - **Resend API key** (optional): lets the site email tracking numbers.
 - **Add another key**: for any other service you start using later.
 
-> **Tip:** A key that says **Set in Vercel** is an environment variable in Vercel; those always win. Change them in Vercel → Settings → Environment Variables.
+> **Tip:** A key that says **Set in Vercel** is an environment variable in Vercel; those always win. Change them in Vercel > Settings > Environment Variables.
 
 <a id="inbox"></a>
 ### Inbox
@@ -270,7 +270,7 @@ _Messages from your shop's contact form._
 
 When a customer fills in the contact form at the bottom of your shop, the message lands here and you get a notification. Tap one to read it, and **Reply** to answer from your own email.
 
-Turn the form on or off in **Settings → Checkout & emails**.
+Turn the form on or off in **Settings > Checkout & emails**.
 
 <a id="discounts"></a>
 ### Discounts
@@ -325,7 +325,7 @@ For things the variables file can't do (new themes, menu links, checkout options
 
 To get ChatGPT's help: copy the code under the label into ChatGPT, describe the change, and paste its answer back on GitHub the same way as the variables file.
 
-> **Tip:** Passwords and keys never go in any file. They live in Vercel → Settings → Environment Variables.
+> **Tip:** Passwords and keys never go in any file. They live in Vercel > Settings > Environment Variables.
 
 ## Payments & services
 
@@ -343,11 +343,11 @@ Stripe sends the money to your bank on a regular schedule (see **Payouts** in St
 1. While your Stripe key starts with `sk_test`, payments are pretend. Settings shows **Test mode**.
 2. Buy something using card `4242 4242 4242 4242`, any future date and any 3-digit code.
 3. Check that the order shows in **Orders** and you got a notification.
-4. When ready, follow **Setup → Go live**: paste your live key (`sk_live…`) on **Keys** and press **Connect Stripe webhook** again.
+4. When ready, follow **Setup > Go live**: paste your live key (`sk_live…`) on **Keys** and press **Connect Stripe webhook** again.
 
 #### Promo codes and sales tax
 
-Customers can type promo codes made in Stripe (see **Discounts**). If you turn on **Sales tax by Stripe** in Settings, Stripe adds the right tax at checkout. Set up Stripe Tax first in Stripe → Settings → Tax.
+Customers can type promo codes made in Stripe (see **Discounts**). If you turn on **Sales tax by Stripe** in Settings, Stripe adds the right tax at checkout. Set up Stripe Tax first in Stripe > Settings > Tax.
 
 #### Refunds
 
@@ -358,7 +358,7 @@ Open the order, tap **Open in Stripe**, and refund it there. The order here swit
 
 _Make products in Stripe and they appear in the shop._
 
-1. In Stripe, go to **Product catalog → + Add product**.
+1. In Stripe, go to **Product catalog > + Add product**.
 2. Fill in the name, description and photos. Under pricing choose **One-off** and enter the price.
 3. Optional: at the bottom, under **Metadata**, add extra details (below).
 4. Save. The item appears in your shop within seconds (or press **Sync from Stripe** on Products).
@@ -383,8 +383,8 @@ Archiving or deleting a product in Stripe hides it in the shop. Past orders keep
 _Where the site lives and where your data is kept._
 
 - **GitHub** holds the site's files. Every change there makes Vercel publish a new version.
-- **Vercel** hosts the site. **Deployments** shows each version; you can roll back to an earlier one. **Settings → Environment Variables** holds your password and keys.
-- **Supabase** (Vercel → Storage) is the database and photo storage. The site creates its own table and photo folder the first time it runs. Open it from Vercel → Storage if you ever want to look inside.
+- **Vercel** hosts the site. **Deployments** shows each version; you can roll back to an earlier one. **Settings > Environment Variables** holds your password and keys.
+- **Supabase** (Vercel > Storage) is the database and photo storage. The site creates its own table and photo folder the first time it runs. Open it from Vercel > Storage if you ever want to look inside.
 
 > **Tip:** Your owner password is the `ADMIN_PASSWORD` setting in Vercel. To change it, edit it there and redeploy.
 
@@ -410,15 +410,15 @@ _Quick fixes for things that go sideways._
 
 #### I changed site-variables.ts but the site didn't change
 
-Give it a minute, then refresh. In Vercel → Deployments, check that the newest one says **Ready**. If it says **Error**, the file has a mistake: open the error, paste it into ChatGPT with the file, and commit the fix. The old site stays up meanwhile.
+Give it a minute, then refresh. In Vercel > Deployments, check that the newest one says **Ready**. If it says **Error**, the file has a mistake: open the error, paste it into ChatGPT with the file, and commit the fix. The old site stays up meanwhile.
 
 #### A customer paid but there's no order
 
-Orders usually appear when the customer reaches the thank-you page. If they closed the page early, the Stripe webhook delivers it. Check **Setup → Webhook connected** is green; if not, press **Connect Stripe webhook** on **Keys**.
+Orders usually appear when the customer reaches the thank-you page. If they closed the page early, the Stripe webhook delivers it. Check **Setup > Webhook connected** is green; if not, press **Connect Stripe webhook** on **Keys**.
 
 #### Phone notifications don't arrive
 
-On iPhone they only work from the home-screen app (iOS 16.4+). Open it, go to **Settings**, and tap **Send a test**. If notifications are blocked, allow them in iPhone Settings → Notifications → Shop HQ. New orders still show under the bell either way.
+On iPhone they only work from the home-screen app (iOS 16.4+). Open it, go to **Settings**, and tap **Send a test**. If notifications are blocked, allow them in iPhone Settings > Notifications > Shop HQ. New orders still show under the bell either way.
 
 #### Photo upload fails
 
@@ -426,7 +426,7 @@ Check that the database step on **Setup** is green (Supabase connected). Use JPG
 
 #### My changes disappear after a while
 
-The database step on **Setup** needs to be green. If it says it's saving to this computer only, connect Supabase in Vercel → Storage and redeploy.
+The database step on **Setup** needs to be green. If it says it's saving to this computer only, connect Supabase in Vercel > Storage and redeploy.
 
 #### A product I made in Stripe isn't showing
 
@@ -438,7 +438,7 @@ The secret that protects saved keys changed (usually AUTH_SECRET was added or ed
 
 #### I forgot my password
 
-If you never changed it in Settings: in Vercel → your project → Settings → Environment Variables, edit `ADMIN_PASSWORD`, then redeploy (Deployments → ⋯ → Redeploy). If you changed it in Settings, open Supabase (Vercel → Storage → Open in Supabase) → Table Editor → `shop_kv`, delete the row named `ownerPassword`, and the Vercel password works again.
+If you never changed it in Settings: in Vercel > your project > Settings > Environment Variables, edit `ADMIN_PASSWORD`, then redeploy (Deployments > ⋯ > Redeploy). If you changed it in Settings, open Supabase (Vercel > Storage > Open in Supabase) > Table Editor > `shop_kv`, delete the row named `ownerPassword`, and the Vercel password works again.
 
 #### Checkout says it isn't switched on
 

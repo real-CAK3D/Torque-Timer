@@ -6,7 +6,6 @@ import type { AppNotification, Expense, Message, Order, Product, SiteSettings, S
 // Starting values come from site-variables.ts (the SITE-VARIABLES edit point).
 export const DEFAULT_SETTINGS: SiteSettings = fileSettings();
 
-// ---------- settings ----------
 export async function getSettings(): Promise<SiteSettings> {
   await syncVariables();
   const s = await kv.get<Partial<SiteSettings>>("settings");
@@ -20,7 +19,6 @@ export async function saveSettings(patch: Partial<SiteSettings>) {
   return next;
 }
 
-// ---------- products ----------
 export async function getProducts(): Promise<Product[]> {
   await syncVariables();
   return (await kv.get<Product[]>("products")) ?? [];
@@ -40,7 +38,6 @@ export async function saveProducts(list: Product[]) {
 
 export { newId, slugify } from "./ids";
 
-// ---------- orders ----------
 export async function getOrders(): Promise<Order[]> {
   return (await kv.get<Order[]>("orders")) ?? [];
 }
@@ -49,7 +46,7 @@ export async function saveOrders(list: Order[]) {
   await kv.set("orders", list);
 }
 
-/** Adds an order once (keyed by Stripe session id). Returns true if it was new. */
+// Returns null if we already have it (webhook and thank-you page both call this).
 export async function addOrderOnce(order: Omit<Order, "number">): Promise<Order | null> {
   const orders = await getOrders();
   if (orders.some((o) => o.id === order.id)) return null;
@@ -60,7 +57,6 @@ export async function addOrderOnce(order: Omit<Order, "number">): Promise<Order 
   return full;
 }
 
-// ---------- expenses ----------
 export async function getExpenses(): Promise<Expense[]> {
   return (await kv.get<Expense[]>("expenses")) ?? [];
 }
@@ -68,7 +64,6 @@ export async function saveExpenses(list: Expense[]) {
   await kv.set("expenses", list);
 }
 
-// ---------- notifications ----------
 export async function getNotifications(): Promise<AppNotification[]> {
   return (await kv.get<AppNotification[]>("notifications")) ?? [];
 }
@@ -76,7 +71,6 @@ export async function saveNotifications(list: AppNotification[]) {
   await kv.set("notifications", list.slice(0, 200));
 }
 
-// ---------- analytics ----------
 export function dayKey(d = new Date()) {
   return d.toISOString().slice(0, 10);
 }
@@ -100,7 +94,6 @@ export async function getAnalytics() {
   return { views, visitors, productViews, referrers };
 }
 
-// ---------- push subscriptions ----------
 export type PushSub = { endpoint: string; keys: { p256dh: string; auth: string }; label?: string };
 export async function getPushSubs(): Promise<PushSub[]> {
   return (await kv.get<PushSub[]>("pushSubs")) ?? [];
@@ -109,7 +102,6 @@ export async function savePushSubs(list: PushSub[]) {
   await kv.set("pushSubs", list);
 }
 
-// ---------- inbox & email list ----------
 export async function getMessages(): Promise<Message[]> {
   return (await kv.get<Message[]>("messages")) ?? [];
 }

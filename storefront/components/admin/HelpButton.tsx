@@ -3,7 +3,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { topicForPath } from "@/lib/help";
 
-/** The ? icon in the top bar. Opens the help topic for the page you're on. */
 export function HelpButton() {
   const path = usePathname();
   const onHelp = path.startsWith("/admin/help");

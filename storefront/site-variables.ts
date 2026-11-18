@@ -1,7 +1,6 @@
-/* ============================================================================
+/*
  *  EDIT-POINT: SITE-VARIABLES
  *  Every word, price, product and setting on the shop, in one file.
- * ============================================================================
  *
  *  HOW TO CHANGE THE SITE WITH CHATGPT
  *  1. On GitHub, open this file and click the "Copy raw file" button.
@@ -18,7 +17,6 @@
  *  mistake in it, and the current site stays up. Open the commit on GitHub and
  *  click "Revert", or ask ChatGPT to fix the error message Vercel emails you.
  *
- *  ----------------------------------------------------------------------------
  *  RULES FOR CHATGPT (read these before editing this file)
  *  - Return the COMPLETE file every time, from the first line to the last.
  *  - Only change the values the owner asked about. Keep every key, every
@@ -39,26 +37,25 @@
  *    or leave photos out and he adds them in the dashboard.
  *  - If a request can't be done in this file, say so and name the closest
  *    "EDIT-POINT" from CUSTOMIZE.md instead of guessing.
- *  ----------------------------------------------------------------------------
  *
  *  HOW THIS FILE AND THE DASHBOARD WORK TOGETHER
  *  The dashboard can change most of these too. When this file changes, only the
  *  values that changed here are applied. Everything else keeps what was set in
  *  the dashboard. Whichever was changed most recently wins.
  *  Orders, expenses and customers live in the dashboard, not here.
- * ========================================================================== */
+ */
 
 import type { SiteVariables } from "./lib/site-variables-type";
 
 export const SITE_VARIABLES = {
-  // ---------------------------------------------------------------- BRAND
+  // Brand
   brand: {
     businessName: "Your Business Name", // header, footer, browser tab
     tagline: "Veteran-owned. Handmade with discipline.", // search results and the Field Manual sidebar
     announcement: "Veteran owned and operated. Every order packed by hand.", // thin banner on top of every page; "" hides it
   },
 
-  // ------------------------------------------------------------ HOME PAGE
+  // Home page
   homePage: {
     headline: "Built to standard. Made by hand.", // big headline; best under 8 words
     intro:
@@ -67,7 +64,7 @@ export const SITE_VARIABLES = {
     allItemsHeading: "Everything else", // above the rest of the items
   },
 
-  // ---------------------------------------------------------------- ABOUT
+  // About
   about: {
     heading: "About the maker",
     story:
@@ -76,7 +73,7 @@ export const SITE_VARIABLES = {
     showVeteranBadge: true, // the star badge with the service line
   },
 
-  // -------------------------------------------------------------- CONTACT
+  // Contact
   contact: {
     heading: "Get in touch",
     text: "Custom orders, questions or a status check on your order.",
@@ -86,13 +83,13 @@ export const SITE_VARIABLES = {
     showContactForm: true, // a message form customers can fill in; messages land in the dashboard Inbox
   },
 
-  // ----------------------------------------------------------- NEWSLETTER
+  // Newsletter
   newsletter: {
     show: true, // email sign-up box in the footer; the list is under Customers in the dashboard
     text: "New items and restocks, a few times a year. No spam.",
   },
 
-  // --------------------------------------------------------------- SOCIAL
+  // Social
   // Full web addresses starting with https://   "" hides that button.
   social: {
     facebook: "",
@@ -103,7 +100,7 @@ export const SITE_VARIABLES = {
     etsy: "",
   },
 
-  // ------------------------------------------------------------- POLICIES
+  // Policies
   policies: {
     shipping:
       "Orders ship within 3-5 business days. Made-to-order items may take a little longer; you'll get an email when yours ships.",
@@ -116,7 +113,7 @@ export const SITE_VARIABLES = {
       "By ordering from {business} you agree to these terms.\n\nPrices are in US dollars and can change at any time. Your order is confirmed when payment goes through, and you'll get a receipt by email.\n\nHandmade items vary a little from piece to piece, and that's part of their character. Photos are as accurate as we can make them.\n\nShipping times are estimates. Once a package is with the carrier, delivery is up to them, but we'll help sort out any problem.\n\nSee our shipping and returns policies for the rest. Questions: {email}.",
   },
 
-  // --------------------------------------------------------------- IMAGES
+  // Images
   // Upload images to storefront/public/images on GitHub and write "/images/name.png",
   // or upload them in the dashboard (Words & logos). "" uses the built-in badge / no photo.
   images: {
@@ -127,13 +124,13 @@ export const SITE_VARIABLES = {
     aboutPhoto: "", // photo of the owner or workshop
   },
 
-  // ----------------------------------------------------------------- LOOK
+  // Look
   look: {
     theme: "military-police", // military-police | olive-drab | ocp-field | dress-blues | night-patrol | old-glory | brass-leather | clean-dispatch
     layout: "garrison", // garrison | field-manual | showroom | quartermaster
   },
 
-  // ---------------------------------------------------------------- STORE
+  // Store
   store: {
     open: true, // false pauses ordering; the shop stays visible
     closedMessage: "The shop is on leave for a few days. Orders reopen soon.",
@@ -158,7 +155,7 @@ export const SITE_VARIABLES = {
     ],
   },
 
-  // ------------------------------------------------------------- PRODUCTS
+  // Products
   // One { ... } block per item. Copy a block to add an item.
   //   slug         unique web name, lowercase-with-dashes
   //   price        dollars;  wasPrice: a higher "was" price to show a sale, or null

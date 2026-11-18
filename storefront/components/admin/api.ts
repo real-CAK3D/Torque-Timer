@@ -10,7 +10,7 @@ export async function api<T = unknown>(url: string, method: string, body?: unkno
   return data as T;
 }
 
-/** Shrinks big phone photos before upload so they fit and load fast. */
+// phone photos are often 5MB+, which is over Vercel's upload limit
 async function shrink(file: File, maxSide = 1800): Promise<Blob> {
   if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
   const bmp = await createImageBitmap(file).catch(() => null);

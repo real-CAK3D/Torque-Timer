@@ -2,7 +2,6 @@ import Link from "next/link";
 import { SETUP_STEPS } from "@/lib/setup-steps";
 import { getStatus } from "@/lib/status";
 
-/** "Finish setting up" box on the dashboard. Disappears when every required step is done. */
 export async function SetupChecklist() {
   const st = await getStatus();
   const steps = SETUP_STEPS.filter((s) => s.check && !s.optional);

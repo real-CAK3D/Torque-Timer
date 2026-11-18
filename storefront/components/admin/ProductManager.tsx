@@ -160,7 +160,7 @@ export function ProductManager({ initial, currency, views, lowAt, stripeOn, stri
                 <span className="plist-thumb">{/* eslint-disable-next-line @next/next/no-img-element */}{p.images[0] ? <img src={p.images[0]} alt="" /> : null}</span>
                 <span className="plist-name">
                   <strong>{p.name}</strong>
-                  <span className="muted">{[p.stripeProductId ? "From Stripe" : null, p.category, p.active ? null : "Hidden", p.featured ? "Featured" : null].filter(Boolean).join(" · ")}</span>
+                  <span className="muted">{[p.stripeProductId ? "From Stripe" : null, p.category, p.active ? null : "Hidden", p.featured ? "Featured" : null].filter(Boolean).join(", ")}</span>
                 </span>
                 <span className="plist-meta">
                   <strong>{money(p.price, currency)}</strong>

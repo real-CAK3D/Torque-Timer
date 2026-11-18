@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import type { HelpBlock } from "@/lib/help";
 
-/** Renders **bold** and `code` without injecting HTML. */
 export function Rich({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
   return (

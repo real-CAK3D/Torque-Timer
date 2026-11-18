@@ -2,7 +2,6 @@
 import { useRef, useState } from "react";
 import { uploadImage } from "./api";
 
-/** One image (logo, hero photo...). */
 export function ImageField({ label, hint, value, onChange, folder, shape = "wide" }: { label: string; hint?: string; value: string; onChange: (url: string) => void; folder: string; shape?: "wide" | "square" }) {
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -37,7 +36,6 @@ export function ImageField({ label, hint, value, onChange, folder, shape = "wide
   );
 }
 
-/** Several images (product photos), reorderable. */
 export function ImageList({ value, onChange, folder }: { value: string[]; onChange: (urls: string[]) => void; folder: string }) {
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(0);

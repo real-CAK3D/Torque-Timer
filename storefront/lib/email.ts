@@ -1,12 +1,12 @@
 import "server-only";
 import { getKey } from "./keys";
 
-/* ============================================================================
+/*
  *  EDIT-POINT: EMAILS
  *  Emails the site sends to customers (through Resend, if a key is saved).
  *  Stripe sends the payment receipt itself; turn that on in Stripe >
  *  Settings > Customer emails > "Successful payments".
- * ========================================================================== */
+ */
 
 export async function emailReady(from: string) {
   return Boolean(from && (await getKey("RESEND_API_KEY")));

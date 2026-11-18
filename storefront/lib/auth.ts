@@ -1,10 +1,10 @@
 // Works in both the edge middleware and Node route handlers (Web Crypto only).
 export const SESSION_COOKIE = "owner_session";
-/* ========================================================================
+/*
  * EDIT-POINT: LOGIN
  * How many days the owner stays logged in. The password itself is the
  * ADMIN_PASSWORD environment variable in Vercel, not in the code.
- * ======================================================================== */
+ */
 export const SESSION_DAYS = 60;
 
 function secret() {

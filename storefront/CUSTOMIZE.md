@@ -1,5 +1,7 @@
 # Customizing the shop
 
+Two ways to change things. The first covers almost everything.
+
 ## 1. Words, prices, products and settings: `site-variables.ts`
 
 Everything on the shop that isn't code lives in one file: **`storefront/site-variables.ts`**. It holds the business name, headlines, about story, contact info, social links, policies, logo/photo paths, theme, layout, shipping, store open/closed and the full product list. Every value has a note next to it saying what it does, and the top of the file has instructions written for ChatGPT.
@@ -21,8 +23,8 @@ Everything on the shop that isn't code lives in one file: **`storefront/site-var
 ### Photos
 
 ChatGPT can't upload photos. Either:
-- upload them in the dashboard (**Products** → the item → Add photos, or **Words & logos**), or
-- on GitHub, open `storefront/public/images`, click **Add file → Upload files**, then refer to them in `site-variables.ts` as `"/images/file-name.jpg"` (for example `logo: "/images/logo.png"` or `photos: ["/images/pen-1.jpg"]`).
+- upload them in the dashboard (**Products** > the item > Add photos, or **Words & logos**), or
+- on GitHub, open `storefront/public/images`, click **Add file > Upload files**, then refer to them in `site-variables.ts` as `"/images/file-name.jpg"` (for example `logo: "/images/logo.png"` or `photos: ["/images/pen-1.jpg"]`).
 
 If a product has no `photos` line, the photos added in the dashboard are kept.
 
@@ -39,11 +41,11 @@ Both can change the same things. When `site-variables.ts` changes, **only the va
 Places in the code meant to be edited are labeled like this:
 
 ```ts
-/* ========================================================================
+/*
  * EDIT-POINT: THEMES
  * The color + font themes the owner picks under Look & layout.
  * ...
- * ======================================================================== */
+ */
 ```
 
 Find one by searching the repository for `EDIT-POINT: NAME` (on GitHub press `/` and type it), or run `npm run edit-points` in the `storefront` folder for a list with file and line numbers.
@@ -76,4 +78,4 @@ Find one by searching the repository for `EDIT-POINT: NAME` (on GitHub press `/`
 2. Copy the code under it into ChatGPT: *"Here is the NAV-LINKS section of my site. Add a link called Custom Orders that goes to /#contact. Give me the full replacement."*
 3. On GitHub, click the pencil, swap in the new code, and click **Commit changes**. Vercel rebuilds automatically.
 
-Passwords and keys never go in any file. They live in Vercel → Settings → Environment Variables.
+Passwords and keys never go in any file. They live in Vercel > Settings > Environment Variables.

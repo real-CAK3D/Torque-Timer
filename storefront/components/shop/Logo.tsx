@@ -9,7 +9,6 @@ export function Logo({ s, size = 44 }: { s: SiteSettings; size?: number }) {
   return <Emblem initials={initialsOf(s.businessName)} size={size} />;
 }
 
-/** The embroidered patch frame. The site's signature element. */
 export function Patch({ s, size = 180 }: { s: SiteSettings; size?: number }) {
   const src = s.emblem || s.logo;
   return (

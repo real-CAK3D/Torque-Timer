@@ -48,7 +48,6 @@ export function supabase(): SupabaseClient {
 
 let ready: Promise<void> | null = null;
 
-/** Makes sure the table, counter function and photo bucket exist. Runs once per server. */
 export function ensureSupabase(): Promise<void> {
   ready ??= setup().catch((e) => {
     ready = null; // try again on the next request
@@ -87,7 +86,6 @@ async function setup() {
   }
 }
 
-/** For the setup checklist: is the table there? */
 export async function supabaseStatus(): Promise<{ ok: boolean; message: string }> {
   if (!supabaseConfigured()) return { ok: false, message: "Not connected" };
   try {

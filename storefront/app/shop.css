@@ -1,9 +1,9 @@
-/* ========================================================================
+/*
  * EDIT-POINT: STOREFRONT-STYLES
  * Shape and spacing of the customer-facing shop. Colors and fonts are NOT here;
  * they live in THEMES (lib/themes.ts) and arrive as var(--accent) etc.
  * Each layout has its own labeled section below (Garrison, Field Manual...).
- * ======================================================================== */
+ */
 /* Storefront styles. Colors and fonts come from the active theme (lib/themes.ts). */
 *,
 *::before,

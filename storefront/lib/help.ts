@@ -1,11 +1,11 @@
-/* ============================================================================
+/*
  *  EDIT-POINT: HELP
  *  The owner's guide. This one file feeds both:
  *    - the Help page in the dashboard (the ? icon), and
  *    - GUIDE.md on GitHub (regenerate it with: npm run guide)
  *  "match" ties a topic to dashboard pages, so the ? icon opens the right one.
  *  Text supports **bold** and `code`.
- * ========================================================================== */
+ */
 
 export type HelpBlock =
   | { p: string }
@@ -33,7 +33,7 @@ export const HELP: HelpGroup[] = [
               "**The dashboard** (`yourshop.com/admin`). Only you can get in, with your password. Customers never see it and nothing on the shop links to it.",
             ],
           },
-          { p: "Behind the scenes, a few services do the heavy lifting:" },
+          { p: "It runs on a few outside services:" },
           {
             list: [
               "**Stripe** takes payments (card, Apple Pay, Google Pay) and sends the money to your bank.",
@@ -102,7 +102,7 @@ export const HELP: HelpGroup[] = [
         id: "dashboard",
         title: "Dashboard",
         match: ["/admin"],
-        summary: "Your sales, orders, profit and visitors at a glance.",
+        summary: "Sales, orders, profit and visitors.",
         blocks: [
           { p: "Pick **7 days**, **30 days**, **90 days** or **1 yr** at the top to change the time period for everything on the page." },
           {
@@ -130,7 +130,7 @@ export const HELP: HelpGroup[] = [
             list: [
               "**Items**, **shipping cost** and how they paid (Apple Pay, Google Pay or card).",
               "**Ship to**: the customer's name and address. Tap their email or phone to contact them.",
-              "**Status**: **To ship** → **Shipped** → **Delivered**. Mark **Refunded** or **Cancelled** if needed. Refunds made in Stripe update here on their own.",
+              "**Status**: **To ship**, then **Shipped**, then **Delivered**. Mark **Refunded** or **Cancelled** if needed. Refunds made in Stripe update here on their own.",
               "**Private note**: tracking numbers, engraving text, anything to remember. Customers never see it. It saves when you tap outside the box.",
               "**Open in Stripe**: the payment in your Stripe account, where you can issue a refund.",
             ],
@@ -144,7 +144,7 @@ export const HELP: HelpGroup[] = [
             ],
           },
           { p: "The filter buttons at the top show only orders waiting to ship, shipped, or delivered. **Download spreadsheet** saves every order for your records or taxes. Discounts, promo codes and sales tax show on each order when used." },
-          { tip: "Customers get their payment receipt from Stripe (turn it on in Stripe → Settings → Customer emails). Changing a status by itself doesn't email anyone; the ship button does." },
+          { tip: "Customers get their payment receipt from Stripe (turn it on in Stripe > Settings > Customer emails). Changing a status by itself doesn't email anyone; the ship button does." },
         ],
       },
       {
@@ -283,7 +283,7 @@ export const HELP: HelpGroup[] = [
               "**Add another key**: for any other service you start using later.",
             ],
           },
-          { tip: "A key that says **Set in Vercel** is an environment variable in Vercel; those always win. Change them in Vercel → Settings → Environment Variables." },
+          { tip: "A key that says **Set in Vercel** is an environment variable in Vercel; those always win. Change them in Vercel > Settings > Environment Variables." },
         ],
       },
       {
@@ -293,7 +293,7 @@ export const HELP: HelpGroup[] = [
         summary: "Messages from your shop's contact form.",
         blocks: [
           { p: "When a customer fills in the contact form at the bottom of your shop, the message lands here and you get a notification. Tap one to read it, and **Reply** to answer from your own email." },
-          { p: "Turn the form on or off in **Settings → Checkout & emails**." },
+          { p: "Turn the form on or off in **Settings > Checkout & emails**." },
         ],
       },
       {
@@ -361,7 +361,7 @@ export const HELP: HelpGroup[] = [
         blocks: [
           { p: "For things the variables file can't do (new themes, menu links, checkout options), the code has labeled blocks that start with `EDIT-POINT:` and explain what to change. Search the repository on GitHub for `EDIT-POINT` to find them. `CUSTOMIZE.md` lists them all." },
           { p: "To get ChatGPT's help: copy the code under the label into ChatGPT, describe the change, and paste its answer back on GitHub the same way as the variables file." },
-          { tip: "Passwords and keys never go in any file. They live in Vercel → Settings → Environment Variables." },
+          { tip: "Passwords and keys never go in any file. They live in Vercel > Settings > Environment Variables." },
         ],
       },
     ],
@@ -382,11 +382,11 @@ export const HELP: HelpGroup[] = [
               "While your Stripe key starts with `sk_test`, payments are pretend. Settings shows **Test mode**.",
               "Buy something using card `4242 4242 4242 4242`, any future date and any 3-digit code.",
               "Check that the order shows in **Orders** and you got a notification.",
-              "When ready, follow **Setup → Go live**: paste your live key (`sk_live…`) on **Keys** and press **Connect Stripe webhook** again.",
+              "When ready, follow **Setup > Go live**: paste your live key (`sk_live…`) on **Keys** and press **Connect Stripe webhook** again.",
             ],
           },
           { h: "Promo codes and sales tax" },
-          { p: "Customers can type promo codes made in Stripe (see **Discounts**). If you turn on **Sales tax by Stripe** in Settings, Stripe adds the right tax at checkout. Set up Stripe Tax first in Stripe → Settings → Tax." },
+          { p: "Customers can type promo codes made in Stripe (see **Discounts**). If you turn on **Sales tax by Stripe** in Settings, Stripe adds the right tax at checkout. Set up Stripe Tax first in Stripe > Settings > Tax." },
           { h: "Refunds" },
           { p: "Open the order, tap **Open in Stripe**, and refund it there. The order here switches to **Refunded** by itself." },
         ],
@@ -398,7 +398,7 @@ export const HELP: HelpGroup[] = [
         blocks: [
           {
             steps: [
-              "In Stripe, go to **Product catalog → + Add product**.",
+              "In Stripe, go to **Product catalog > + Add product**.",
               "Fill in the name, description and photos. Under pricing choose **One-off** and enter the price.",
               "Optional: at the bottom, under **Metadata**, add extra details (below).",
               "Save. The item appears in your shop within seconds (or press **Sync from Stripe** on Products).",
@@ -428,8 +428,8 @@ export const HELP: HelpGroup[] = [
           {
             list: [
               "**GitHub** holds the site's files. Every change there makes Vercel publish a new version.",
-              "**Vercel** hosts the site. **Deployments** shows each version; you can roll back to an earlier one. **Settings → Environment Variables** holds your password and keys.",
-              "**Supabase** (Vercel → Storage) is the database and photo storage. The site creates its own table and photo folder the first time it runs. Open it from Vercel → Storage if you ever want to look inside.",
+              "**Vercel** hosts the site. **Deployments** shows each version; you can roll back to an earlier one. **Settings > Environment Variables** holds your password and keys.",
+              "**Supabase** (Vercel > Storage) is the database and photo storage. The site creates its own table and photo folder the first time it runs. Open it from Vercel > Storage if you ever want to look inside.",
             ],
           },
           { tip: "Your owner password is the `ADMIN_PASSWORD` setting in Vercel. To change it, edit it there and redeploy." },
@@ -463,21 +463,21 @@ export const HELP: HelpGroup[] = [
         summary: "Quick fixes for things that go sideways.",
         blocks: [
           { h: "I changed site-variables.ts but the site didn't change" },
-          { p: "Give it a minute, then refresh. In Vercel → Deployments, check that the newest one says **Ready**. If it says **Error**, the file has a mistake: open the error, paste it into ChatGPT with the file, and commit the fix. The old site stays up meanwhile." },
+          { p: "Give it a minute, then refresh. In Vercel > Deployments, check that the newest one says **Ready**. If it says **Error**, the file has a mistake: open the error, paste it into ChatGPT with the file, and commit the fix. The old site stays up meanwhile." },
           { h: "A customer paid but there's no order" },
-          { p: "Orders usually appear when the customer reaches the thank-you page. If they closed the page early, the Stripe webhook delivers it. Check **Setup → Webhook connected** is green; if not, press **Connect Stripe webhook** on **Keys**." },
+          { p: "Orders usually appear when the customer reaches the thank-you page. If they closed the page early, the Stripe webhook delivers it. Check **Setup > Webhook connected** is green; if not, press **Connect Stripe webhook** on **Keys**." },
           { h: "Phone notifications don't arrive" },
-          { p: "On iPhone they only work from the home-screen app (iOS 16.4+). Open it, go to **Settings**, and tap **Send a test**. If notifications are blocked, allow them in iPhone Settings → Notifications → Shop HQ. New orders still show under the bell either way." },
+          { p: "On iPhone they only work from the home-screen app (iOS 16.4+). Open it, go to **Settings**, and tap **Send a test**. If notifications are blocked, allow them in iPhone Settings > Notifications > Shop HQ. New orders still show under the bell either way." },
           { h: "Photo upload fails" },
           { p: "Check that the database step on **Setup** is green (Supabase connected). Use JPG, PNG or WebP photos." },
           { h: "My changes disappear after a while" },
-          { p: "The database step on **Setup** needs to be green. If it says it's saving to this computer only, connect Supabase in Vercel → Storage and redeploy." },
+          { p: "The database step on **Setup** needs to be green. If it says it's saving to this computer only, connect Supabase in Vercel > Storage and redeploy." },
           { h: "A product I made in Stripe isn't showing" },
           { p: "It needs a **one-off** price in US dollars and must not be archived. Press **Sync from Stripe** on Products. If you're in Stripe test mode, make sure the site is using your test key too (and the same for live)." },
           { h: "A key says \"Needs re-entering\"" },
           { p: "The secret that protects saved keys changed (usually AUTH_SECRET was added or edited in Vercel). Paste the key in again on **Keys**." },
           { h: "I forgot my password" },
-          { p: "If you never changed it in Settings: in Vercel → your project → Settings → Environment Variables, edit `ADMIN_PASSWORD`, then redeploy (Deployments → ⋯ → Redeploy). If you changed it in Settings, open Supabase (Vercel → Storage → Open in Supabase) → Table Editor → `shop_kv`, delete the row named `ownerPassword`, and the Vercel password works again." },
+          { p: "If you never changed it in Settings: in Vercel > your project > Settings > Environment Variables, edit `ADMIN_PASSWORD`, then redeploy (Deployments > ⋯ > Redeploy). If you changed it in Settings, open Supabase (Vercel > Storage > Open in Supabase) > Table Editor > `shop_kv`, delete the row named `ownerPassword`, and the Vercel password works again." },
           { h: "Checkout says it isn't switched on" },
           { p: "The Stripe key is missing. Paste it on the **Keys** page." },
         ],

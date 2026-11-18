@@ -30,11 +30,11 @@ export function Footer({ s }: { s: SiteSettings }) {
         {s.showNewsletter ? <Newsletter text={s.newsletterText} /> : null}
         <Social links={s.social} />
       </div>
-      {/* ========================================================================
+      {/*
           EDIT-POINT: FOOTER
           Small print at the very bottom of every shop page. The policy pages
           themselves are written in site-variables.ts (policies).
-          ======================================================================== */}
+          */}
       <p className="fine">
         © {new Date().getFullYear()} {s.businessName}. Secure checkout by Stripe. Apple Pay and Google Pay accepted.
       </p>

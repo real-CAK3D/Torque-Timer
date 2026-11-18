@@ -5,7 +5,6 @@ import path from "path";
 import { BUCKET, ensureSupabase, supabase, supabaseConfigured } from "./supabase";
 
 export const blobConfigured = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-/** Photos go to Supabase Storage by default, Vercel Blob if that's connected instead, or this computer. */
 export const imageStorage = (): "supabase" | "blob" | "local" => (supabaseConfigured() ? "supabase" : blobConfigured() ? "blob" : "local");
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml", "image/avif"];
 

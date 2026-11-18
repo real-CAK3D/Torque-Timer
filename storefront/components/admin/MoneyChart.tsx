@@ -5,7 +5,6 @@ import { BarChart } from "./BarChart";
 type Day = { day: string; revenue: number; expenses: number };
 const label = (day: string) => new Date(day + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
-// Two separate charts on the same scale rather than one dual-axis chart.
 export function MoneyChart({ days, currency }: { days: Day[]; currency: string }) {
   return (
     <div className="two">

@@ -2,7 +2,7 @@ import "server-only";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "crypto";
 import { kv } from "./store";
 
-/* ============================================================================
+/*
  *  EDIT-POINT: API-KEYS
  *  The keys the owner can paste in under Dashboard > Keys.
  *  Each key is looked up in this order:
@@ -11,7 +11,7 @@ import { kv } from "./store";
  *  To support a new service, add an entry to KEY_DEFS and read it anywhere
  *  on the server with:  await getKey("YOUR_ENV_NAME")
  *  Keys added under "Other keys" in the dashboard work the same way.
- * ========================================================================== */
+ */
 
 export type KeyDef = {
   envName: string;
@@ -105,7 +105,6 @@ async function vault(): Promise<Vault> {
 
 export const validName = (n: string) => /^[A-Z][A-Z0-9_]{1,59}$/.test(n);
 
-/** Read a key: Vercel environment variable first, then the one saved in the dashboard. */
 export async function getKey(envName: string): Promise<string | null> {
   const fromEnv = process.env[envName];
   if (fromEnv) return fromEnv;
@@ -149,7 +148,7 @@ const mask = (v: string, secret: boolean) => (secret ? (v.length > 12 ? `${v.sli
 
 export async function keyStatuses(): Promise<KeyStatus[]> {
   const v = await kv.get<Vault>(VAULT).then((x) => x ?? {});
-  // (the format pattern stays on the server; only plain fields go to the page)
+  // drop `prefix`: a RegExp can't be passed to a client component
   const defs: (Omit<KeyDef, "prefix"> & { custom: boolean })[] = [
     ...KEY_DEFS.map(({ envName, label, group, where, link, secret }) => ({ envName, label, group, where, link, secret, custom: false })),
     ...Object.keys(v)

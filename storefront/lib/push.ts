@@ -9,7 +9,6 @@ export async function vapidKeys() {
 }
 export const pushConfigured = async () => Boolean(await vapidKeys());
 
-/** Saves an in-app notification and pushes it to every phone/computer that turned notifications on. */
 export async function notifyOwner(title: string, body: string, url = "/admin") {
   const list = await getNotifications();
   list.unshift({ id: newId(), createdAt: new Date().toISOString(), title, body, url, read: false });

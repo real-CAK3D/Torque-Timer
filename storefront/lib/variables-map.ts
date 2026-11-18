@@ -3,7 +3,6 @@ import type { Product, SiteSettings } from "./types";
 
 const cents = (d: number | null | undefined) => (d == null ? null : Math.max(0, Math.round(d * 100)));
 
-/** Turns site-variables.ts into the settings the site uses (money becomes cents). */
 export function variablesToSettings(v: SiteVariables): SiteSettings {
   return {
     businessName: v.brand.businessName,
@@ -57,7 +56,7 @@ export function variablesToSettings(v: SiteVariables): SiteSettings {
 
 export type FileProduct = Pick<Product, "slug" | "name" | "price" | "compareAtPrice" | "summary" | "description" | "category" | "stock" | "madeToOrder" | "featured" | "active" | "option"> & { images?: string[] };
 
-/** Turns the products list into the site's product fields. Duplicate slugs keep the first one. */
+// duplicate slugs: first one wins
 export function variablesToProducts(v: SiteVariables): FileProduct[] {
   const seen = new Set<string>();
   const out: FileProduct[] = [];

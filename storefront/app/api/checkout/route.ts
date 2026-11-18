@@ -56,16 +56,15 @@ export async function POST(req: Request) {
   const base = siteUrl(req);
 
   try {
-    /* ========================================================================
+    /*
      * EDIT-POINT: CHECKOUT
      * Stripe Checkout options. Card, Apple Pay, Google Pay and Link are turned
      * on in the Stripe dashboard (Settings > Payment methods), not here.
      * Other options: https://docs.stripe.com/api/checkout/sessions/create
-     * ======================================================================== */
+     */
     const session = await s.checkout.sessions.create({
       mode: "payment",
       line_items: lines,
-      // Card, Apple Pay, Google Pay and Link show up automatically based on your Stripe dashboard settings.
       ...(settings.collectShipping
         ? {
             shipping_address_collection: { allowed_countries: (settings.shipCountries.length ? settings.shipCountries : ["US"]) as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] },
@@ -82,9 +81,8 @@ export async function POST(req: Request) {
           }
         : {}),
       phone_number_collection: { enabled: true },
-      // Lets customers type a promotion code made in Stripe (Product catalog > Coupons).
       allow_promotion_codes: settings.allowPromoCodes || undefined,
-      // Sales tax worked out by Stripe Tax (turn on in Stripe first: Settings > Tax).
+      // needs Stripe Tax set up first (Stripe > Settings > Tax)
       ...(settings.stripeTax ? { automatic_tax: { enabled: true } } : {}),
       metadata: { cart: JSON.stringify(cart).slice(0, 499) },
       success_url: `${base}/success?session_id={CHECKOUT_SESSION_ID}`,

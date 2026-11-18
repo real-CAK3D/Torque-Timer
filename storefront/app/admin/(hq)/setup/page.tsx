@@ -29,8 +29,8 @@ export default async function SetupPage() {
                   <span className="setup-title">
                     <strong>{step.title}</strong>
                     <span className="muted small">
-                      {step.optional ? "Optional · " : ""}{step.time}
-                      {c ? ` · ${c.detail}` : ""}
+                      {step.optional ? "Optional, " : ""}{step.time}
+                      {c ? `. ${c.detail}` : ""}
                     </span>
                   </span>
                 </summary>

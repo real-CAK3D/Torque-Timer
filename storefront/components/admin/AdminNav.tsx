@@ -2,11 +2,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/* ========================================================================
+/*
  * EDIT-POINT: ADMIN-MENU
  * Owner dashboard menu. tab: true items also appear in the phone's bottom bar
  * (keep that to 4; the 5th spot is "More").
- * ======================================================================== */
+ */
 const ITEMS = [
   { href: "/admin", label: "Dashboard", icon: "M3 12l9-8 9 8M5 10v10h5v-6h4v6h5V10", tab: true },
   { href: "/admin/orders", label: "Orders", icon: "M4 4h16v4H4zM5 8v12h14V8M9 12h6", tab: true },

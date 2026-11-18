@@ -18,7 +18,7 @@ const out = [
   "",
   "<!-- Generated from lib/help.ts by `npm run guide`. Edit that file, not this one. -->",
   "",
-  "Everything the site does and how to use it. The same guide is inside the dashboard: tap the **?** icon at the top of any page.",
+  "How each part of the site works. The same guide is in the dashboard under the ? button.",
   "",
   "## Contents",
   "",
@@ -43,8 +43,8 @@ const setup = [
   "",
   "<!-- Generated from lib/setup-steps.ts by `npm run guide`. Edit that file, not this one. -->",
   "",
-  "Everything needed to get the shop online, in order: GitHub, Vercel, Supabase and Stripe (with Apple Pay and Google Pay). " +
-    "After step 3, the dashboard has a **Setup** page with these same steps and a green check as each one is done.",
+  "Getting the shop online, in order: GitHub, Vercel, Supabase, then Stripe (which also handles Apple Pay and Google Pay). " +
+    "Once you can log in (step 3), the dashboard has a Setup page with the same list that checks steps off as you finish them.",
   "",
   `[![Deploy with Vercel](https://vercel.com/button)](${DEPLOY_URL})`,
   "",
@@ -57,7 +57,7 @@ SETUP_STEPS.forEach((st, i) => {
   setup.push(`<a id="${st.id}"></a>`, `## ${i + 1}. ${st.title}${st.optional ? " (optional)" : ""}`, "");
   for (const b of st.blocks) setup.push(...blockLines(b));
   if (st.links?.length) {
-    setup.push(st.links.map((l) => (l.url.startsWith("/") ? `**${l.label}** (in the dashboard: \`${l.url}\`)` : `[${l.label}](${l.url})`)).join(" · "), "");
+    setup.push("Links: " + st.links.map((l) => (l.url.startsWith("/") ? `${l.label} (dashboard, \`${l.url}\`)` : `[${l.label}](${l.url})`)).join(", "), "");
   }
 });
 writeFileSync(new URL("../SETUP.md", import.meta.url), setup.join("\n"));

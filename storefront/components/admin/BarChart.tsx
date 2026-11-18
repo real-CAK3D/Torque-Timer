@@ -3,7 +3,6 @@ import { useState } from "react";
 
 type Point = { label: string; value: number };
 
-/** Single-series bar chart with a hover/tap tooltip. */
 export function BarChart({ data, format, title, emptyText }: { data: Point[]; format: (n: number) => string; title: string; emptyText: string }) {
   const [hover, setHover] = useState<number | null>(null);
   const max = Math.max(1, ...data.map((d) => d.value));

@@ -1,7 +1,7 @@
 import { getExpenses, getOrders, getSubscribers } from "@/lib/db";
 import { getCustomers } from "@/lib/stats";
 
-// Spreadsheet downloads (open in Excel, Numbers or Google Sheets): /api/admin/export?type=orders
+// CSV downloads: /api/admin/export?type=orders|expenses|customers|subscribers
 const cell = (v: unknown) => {
   const s = v === null || v === undefined ? "" : String(v);
   const safe = /^[=+\-@]/.test(s) ? `'${s}` : s; // stop spreadsheets treating text as formulas

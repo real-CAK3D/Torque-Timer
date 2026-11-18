@@ -6,7 +6,7 @@ import { kv } from "./store";
 import { stripe } from "./stripe";
 import type { Product } from "./types";
 
-/* ============================================================================
+/*
  *  EDIT-POINT: STRIPE-CATALOG
  *  Items made in Stripe (Product catalog > + Add product) appear in the shop.
  *
@@ -21,7 +21,7 @@ import type { Product } from "./types";
  *    choice_label    e.g. Color
  *    choice_options  e.g. Black, Brown, Natural
  *  Anything not set in Stripe can be set in the dashboard instead.
- * ========================================================================== */
+ */
 
 const LAST_SYNC = "stripe:lastSync";
 
@@ -33,7 +33,6 @@ function firstSentence(text: string) {
   return (m ? m[1] : t).slice(0, 160);
 }
 
-/** Copies one Stripe product onto the shop's list. Returns what happened. */
 function applyProduct(list: Product[], sp: Stripe.Product, currency: string): "added" | "updated" | "hidden" | "skipped" {
   const i = list.findIndex((p) => p.stripeProductId === sp.id);
   const existing = i >= 0 ? list[i] : undefined;
@@ -83,7 +82,6 @@ function applyProduct(list: Product[], sp: Stripe.Product, currency: string): "a
   return "added";
 }
 
-/** Pulls every product from Stripe. */
 export async function syncStripeCatalog() {
   const s = await stripe();
   if (!s) throw new Error("Add your Stripe secret key first (Dashboard > Keys).");
@@ -106,7 +104,6 @@ export async function syncStripeCatalog() {
   return counts;
 }
 
-/** Updates one product when Stripe tells us it changed (from the webhook). */
 export async function syncStripeProduct(productId: string, deleted = false) {
   const s = await stripe();
   if (!s) return;
@@ -128,7 +125,6 @@ export async function lastStripeSync() {
 
 export type Discount = { id: string; code: string; label: string; uses: number; maxUses: number | null; expires: string | null; active: boolean };
 
-/** Promotion codes customers can type at checkout. Create them in Stripe > Product catalog > Coupons. */
 export async function listDiscounts(): Promise<{ codes: Discount[]; coupons: { id: string; name: string; label: string; valid: boolean }[] }> {
   const s = await stripe();
   if (!s) return { codes: [], coupons: [] };

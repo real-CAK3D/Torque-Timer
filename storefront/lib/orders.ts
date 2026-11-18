@@ -6,7 +6,7 @@ import { notifyOwner } from "./push";
 import { stripe } from "./stripe";
 import type { OrderItem } from "./types";
 
-/** Turn a paid Stripe Checkout session into an order. Safe to call more than once. */
+// Safe to call twice for the same session; addOrderOnce dedupes.
 export async function recordOrderFromSession(sessionId: string) {
   const s = await stripe();
   if (!s) return null;
@@ -96,10 +96,10 @@ export async function recordOrderFromSession(sessionId: string) {
   await saveProducts(products);
 
   const count = items.reduce((n, i) => n + i.quantity, 0);
-  /* ========================================================================
+  /*
    * EDIT-POINT: NOTIFICATION-TEXT
    * Wording of the phone notification sent for each new order and low stock.
-   * ======================================================================== */
+   */
   await notifyOwner(
     `New order #${order.number}: ${money(order.total, order.currency)}`,
     `${order.name || order.email} bought ${count} item${count === 1 ? "" : "s"}.`,

@@ -21,7 +21,7 @@ export type Theme = {
   };
 };
 
-/* ========================================================================
+/*
  * EDIT-POINT: THEMES
  * The color + font themes the owner picks under Look & layout.
  * Add a theme: copy one { ... } entry below, give it a new unique id and name,
@@ -29,7 +29,7 @@ export type Theme = {
  *   bg/surface/surface2 = page and card backgrounds   ink/muted = text
  *   accent = buttons   band = header/footer   stitch = patch stitching + highlights
  * Fonts must be on fonts.google.com, spelled exactly as listed there.
- * ======================================================================== */
+ */
 export const THEMES: Theme[] = [
   {
     id: "military-police",
@@ -211,12 +211,12 @@ export const THEMES: Theme[] = [
 
 export type Layout = { id: string; name: string; description: string; sketch: string };
 
-/* ========================================================================
+/*
  * EDIT-POINT: LAYOUTS
  * The home page layouts. Each id here has a matching file in
  * components/shop/layouts/ and a line in app/(shop)/page.tsx that picks it.
  * To add one: copy a layout file, add an entry here, add it to page.tsx.
- * ======================================================================== */
+ */
 export const LAYOUTS: Layout[] = [
   {
     id: "garrison",

@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const ok = typeof password === "string" && password ? await checkPassword(password) : false;
   if (ok === null) {
     return NextResponse.json(
-      { error: "No owner password is set. Add ADMIN_PASSWORD in Vercel → Settings → Environment Variables, then redeploy." },
+      { error: "No owner password is set. Add ADMIN_PASSWORD in Vercel > Settings > Environment Variables, then redeploy." },
       { status: 500 }
     );
   }

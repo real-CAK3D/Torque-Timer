@@ -40,11 +40,11 @@ export function Contact({ s }: { s: SiteSettings }) {
   if (!any) return null;
   return (
     <section id="contact" className="section contact">
-      {/* ========================================================================
+      {/*
           EDIT-POINT: HOME-PAGE-SECTIONS
           Layout of the About and Contact sections used by every layout. The
           words themselves come from site-variables.ts (about, contact).
-          ======================================================================== */}
+          */}
       <h2>{s.contactHeading}</h2>
       {s.contactText ? <p className="muted">{s.contactText}</p> : null}
       <ul className="contact-list">

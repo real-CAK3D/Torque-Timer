@@ -77,7 +77,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           ) : null}
         </section>
       </div>
-      <p className="muted small">Average order {money(st.avgOrder, c)} · {st.views} page views · Expenses {money(st.expenseTotal, c)}</p>
+      <p className="muted small">Average order {money(st.avgOrder, c)}, {st.views} page views, expenses {money(st.expenseTotal, c)}</p>
     </>
   );
 }

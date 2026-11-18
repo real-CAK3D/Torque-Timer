@@ -10,7 +10,6 @@ import { getPasswordHash } from "./password";
 
 export type Check = { ok: boolean; detail: string };
 
-/** Everything the Setup page and the dashboard checklist report on. */
 export async function getStatus() {
   const [settings, stripeKey, webhookKey, resendKey, push, db, pwHash] = await Promise.all([
     getSettings(),
