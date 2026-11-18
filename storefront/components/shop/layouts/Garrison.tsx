@@ -22,12 +22,12 @@ export function Garrison({ s, products }: HomeProps) {
       <div id="shop" />
       {featured.length ? (
         <section className="section">
-          <h2>Featured</h2>
+          <h2>{s.featuredHeading}</h2>
           <ProductGrid items={featured} currency={s.currency} low={s.lowStockAlert} />
         </section>
       ) : null}
       <section className="section">
-        <h2>{featured.length ? "Everything else" : "Shop"}</h2>
+        <h2>{featured.length ? s.allItemsHeading : "Shop"}</h2>
         <ProductGrid items={featured.length ? rest : products} currency={s.currency} low={s.lowStockAlert} />
       </section>
       <About s={s} />

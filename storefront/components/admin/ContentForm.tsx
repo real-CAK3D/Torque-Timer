@@ -25,6 +25,7 @@ export function ContentForm({ initial }: { initial: SiteSettings }) {
   return (
     <>
       <div className="page-head"><h1>Words & logos</h1></div>
+      <p className="muted">These also live in <code>site-variables.ts</code> on GitHub. Whichever is changed most recently wins.</p>
       <div className="editor">
         <section className="panel stack">
           <h2>Business</h2>
@@ -34,6 +35,8 @@ export function ContentForm({ initial }: { initial: SiteSettings }) {
           <h2>Welcome section</h2>
           {text("heroHeadline", "Headline")}
           {text("heroText", "Intro text", { rows: 3 })}
+          {text("featuredHeading", "Heading above featured items")}
+          {text("allItemsHeading", "Heading above the other items")}
           <h2>About</h2>
           {text("aboutTitle", "About heading")}
           {text("about", "Your story", { rows: 8, hint: "Leave a blank line between paragraphs." })}
@@ -51,6 +54,8 @@ export function ContentForm({ initial }: { initial: SiteSettings }) {
           <ImageField label="Big welcome photo" hint="Used by the Showroom layout. Wide photos look best." value={s.heroImage} onChange={(heroImage) => set({ heroImage })} folder="brand" />
           <ImageField label="About photo" hint="A photo of you or the workshop." value={s.aboutImage} onChange={(aboutImage) => set({ aboutImage })} folder="brand" />
           <h2>Contact</h2>
+          {text("contactHeading", "Contact heading")}
+          {text("contactText", "Contact intro")}
           {text("contactEmail", "Email")}
           {text("contactPhone", "Phone")}
           {text("location", "Location", { placeholder: "e.g. Fort Leonard Wood, MO" })}

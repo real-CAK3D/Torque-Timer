@@ -16,6 +16,8 @@ export async function PUT(req: Request) {
     if (typeof def === "number") patch[k] = Math.max(0, Math.round(Number(v) || 0));
     else if (typeof def === "boolean") patch[k] = Boolean(v);
     else if (typeof def === "string") patch[k] = String(v ?? "").slice(0, 8000);
+    else if (k === "shipCountries" || k === "expenseCategories")
+      patch[k] = Array.isArray(v) ? v.map((x) => String(x).trim().slice(0, 40)).filter(Boolean).slice(0, 50) : def;
     else patch[k] = v;
   }
   return NextResponse.json(await saveSettings(patch as Partial<SiteSettings>));

@@ -1,117 +1,14 @@
 import "server-only";
 import { kv } from "./store";
+import { fileSettings, syncVariables } from "./sync";
 import type { AppNotification, Expense, Order, Product, SiteSettings } from "./types";
 
-/* ========================================================================
- * EDIT-POINT: DEFAULT-TEXT
- * Starting words and settings for a brand-new site (before the owner edits
- * anything). Once the owner saves in the dashboard, the saved values win.
- * New settings must also be added to SiteSettings in lib/types.ts.
- * ======================================================================== */
-export const DEFAULT_SETTINGS: SiteSettings = {
-  businessName: "Your Business Name",
-  tagline: "Veteran-owned. Handmade with discipline.",
-  logo: "",
-  emblem: "",
-  favicon: "",
-  heroImage: "",
-  aboutImage: "",
-  announcement: "Veteran owned and operated. Every order packed by hand.",
-  heroHeadline: "Built to standard. Made by hand.",
-  heroText:
-    "Small-batch goods made in a home workshop by a U.S. Army Military Police veteran. Every piece gets the same attention to detail as a pre-inspection.",
-  aboutTitle: "About the maker",
-  about:
-    "Tell your story here. Where you served, what you make, and why you make it.\n\nCustomers love knowing who is behind the work. A few short paragraphs is plenty.",
-  serviceLine: "U.S. Army Military Police veteran",
-  showVeteranBadge: true,
-  shippingPolicy: "Orders ship within 3–5 business days. Made-to-order items may take a little longer; you'll get an email when yours ships.",
-  returnPolicy: "If something isn't right, reach out within 30 days and we'll make it right.",
-  contactEmail: "",
-  contactPhone: "",
-  location: "",
-  social: {},
-  theme: "military-police",
-  layout: "garrison",
-  currency: "usd",
-  shippingFlat: 800,
-  freeShippingOver: 7500,
-  collectShipping: true,
-  storeOpen: true,
-  closedMessage: "The shop is on leave for a few days. Orders reopen soon.",
-  lowStockAlert: 2,
-  githubRepo: "",
-  vercelProject: "",
-  customLinks: [],
-};
-
-const now = () => new Date().toISOString();
-
-/* ========================================================================
- * EDIT-POINT: SAMPLE-PRODUCTS
- * Demo items that appear the first time the site runs. Prices are in CENTS
- * (6500 = $65.00). Delete them from the dashboard, or empty this list.
- * ======================================================================== */
-const SAMPLE_PRODUCTS: Product[] = [
-  {
-    id: "sample-1",
-    slug: "challenge-coin-display",
-    name: "Challenge Coin Display",
-    price: 6500,
-    compareAtPrice: null,
-    summary: "Hardwood rack that holds 24 coins, finished by hand.",
-    description:
-      "Solid walnut with routed slots for 24 standard coins. Sanded to 320 grit and finished with three coats of oil.\n\nThis is a sample item. Edit or delete it from your dashboard.",
-    category: "Woodwork",
-    images: [],
-    stock: 5,
-    madeToOrder: false,
-    featured: true,
-    active: true,
-    option: { label: "Wood", values: ["Walnut", "Oak", "Cherry"] },
-    createdAt: now(),
-    updatedAt: now(),
-  },
-  {
-    id: "sample-2",
-    slug: "flag-case",
-    name: "Memorial Flag Case",
-    price: 12000,
-    compareAtPrice: 14000,
-    summary: "Triangle case for a 5' × 9.5' burial flag.",
-    description: "Glass-front triangle case with a hand-cut mitered frame. Engraving available on request.\n\nThis is a sample item.",
-    category: "Woodwork",
-    images: [],
-    stock: null,
-    madeToOrder: true,
-    featured: true,
-    active: true,
-    option: null,
-    createdAt: now(),
-    updatedAt: now(),
-  },
-  {
-    id: "sample-3",
-    slug: "leather-keychain",
-    name: "Leather Keychain",
-    price: 1800,
-    compareAtPrice: null,
-    summary: "Stitched leather fob with a solid brass ring.",
-    description: "Veg-tan leather, saddle stitched, edges burnished.\n\nThis is a sample item.",
-    category: "Leather",
-    images: [],
-    stock: 20,
-    madeToOrder: false,
-    featured: false,
-    active: true,
-    option: { label: "Color", values: ["Natural", "Brown", "Black"] },
-    createdAt: now(),
-    updatedAt: now(),
-  },
-];
+// Starting values come from site-variables.ts (the SITE-VARIABLES edit point).
+export const DEFAULT_SETTINGS: SiteSettings = fileSettings();
 
 // ---------- settings ----------
 export async function getSettings(): Promise<SiteSettings> {
+  await syncVariables();
   const s = await kv.get<Partial<SiteSettings>>("settings");
   return { ...DEFAULT_SETTINGS, ...(s ?? {}), social: { ...(s?.social ?? {}) } };
 }
@@ -125,12 +22,8 @@ export async function saveSettings(patch: Partial<SiteSettings>) {
 
 // ---------- products ----------
 export async function getProducts(): Promise<Product[]> {
-  const p = await kv.get<Product[]>("products");
-  if (p === null) {
-    await kv.set("products", SAMPLE_PRODUCTS);
-    return SAMPLE_PRODUCTS;
-  }
-  return p;
+  await syncVariables();
+  return (await kv.get<Product[]>("products")) ?? [];
 }
 
 export async function getActiveProducts() {
@@ -145,19 +38,7 @@ export async function saveProducts(list: Product[]) {
   await kv.set("products", list);
 }
 
-export function slugify(s: string) {
-  return (
-    s
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 60) || "item"
-  );
-}
-
-export function newId() {
-  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-}
+export { newId, slugify } from "./ids";
 
 // ---------- orders ----------
 export async function getOrders(): Promise<Order[]> {

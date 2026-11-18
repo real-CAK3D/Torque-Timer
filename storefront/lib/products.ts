@@ -1,5 +1,5 @@
 import "server-only";
-import { newId, slugify } from "./db";
+import { newId, slugify } from "./ids";
 import type { Product } from "./types";
 
 export function cleanProduct(input: Partial<Product>, existing?: Product): Product {

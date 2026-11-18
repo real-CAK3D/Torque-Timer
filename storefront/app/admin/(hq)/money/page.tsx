@@ -34,7 +34,7 @@ export default async function Money({ searchParams }: { searchParams: Promise<{ 
           <table className="tbl"><tbody>{[...byCat.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => <tr key={k}><td>{k}</td><td>{money(v, c)}</td></tr>)}</tbody></table>
         </section>
       ) : null}
-      <ExpenseManager initial={expenses} currency={c} />
+      <ExpenseManager initial={expenses} currency={c} categories={s.expenseCategories} />
       <p className="muted small">Income counts paid, shipped and delivered orders (refunds are left out). Stripe fees appear in your Stripe dashboard; add them here as an expense if you want them in your profit.</p>
     </>
   );

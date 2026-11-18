@@ -16,7 +16,6 @@ Customers never see the dashboard. Nothing on the shop links to it, every `/admi
 | **Customers** | Everyone who ordered, how often and how much |
 | **Words & logos** | Business name, headline, about story, service line, veteran badge, policies, contact, social links, logo / patch / tab icon / photos |
 | **Look & layout** | Pick a theme and layout with a live preview before saving |
-| **ChatGPT helper** | Copy the shop to ChatGPT, describe a change, paste the reply back, preview old → new, apply, undo. See `CUSTOMIZE.md` |
 | **Settings** | Open/close the shop, shipping prices, low-stock alerts, phone notifications, links and status for Stripe, Apple Pay, Google Pay, GitHub, Vercel, storage, plus your own shortcut links |
 
 **Themes:** Military Police (MP green & gold, black brassard band), Olive Drab, OCP Field, Dress Blues, Night Patrol (dark), Old Glory, Brass & Leather, Clean Dispatch.
@@ -59,7 +58,7 @@ Redeploy after connecting storage so the new variables are picked up.
 (iPhone needs iOS 16.4+ and the home-screen app for web notifications. New orders also show under the bell icon in the dashboard.)
 
 ### 6. Hand it over
-Log in, open **Words & logos**, replace the placeholder name and story, upload the logo, then delete the three sample products and add real ones.
+Fill in `site-variables.ts` on GitHub (name, story, contact, real products), or do it in the dashboard under **Words & logos** and **Products**. Upload the logo either way.
 
 ## Run it on your computer
 
@@ -72,7 +71,7 @@ npm run dev
 Open http://localhost:3000 for the shop and http://localhost:3000/admin for the dashboard (password `changeme` locally unless `ADMIN_PASSWORD` is set). Without Redis/Blob configured, data is saved to `.data/db.json` and images to `public/uploads/`. Both are git-ignored.
 
 ## Changing things later
-See **[CUSTOMIZE.md](CUSTOMIZE.md)**: the ChatGPT helper for everyday changes, and the `EDIT-POINT` markers (`npm run edit-points`) for code changes.
+All words, prices, products and settings live in **[`site-variables.ts`](site-variables.ts)**. Copy it into ChatGPT, ask for a change, paste the result back on GitHub and commit; Vercel updates the site. The dashboard can change the same things. Code spots meant for editing are marked `EDIT-POINT` (`npm run edit-points`). Full steps: **[CUSTOMIZE.md](CUSTOMIZE.md)**.
 
 ## How it's built
 - Next.js 15 (App Router) + TypeScript, no CSS framework. Themes are CSS variables in `lib/themes.ts`; add a theme by adding an entry there.

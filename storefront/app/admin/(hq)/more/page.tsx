@@ -7,7 +7,6 @@ const LINKS = [
   { href: "/admin/customers", label: "Customers", note: "Who's buying and how much" },
   { href: "/admin/content", label: "Words & logos", note: "Business name, about, logos, photos" },
   { href: "/admin/appearance", label: "Look & layout", note: "Themes and page styles" },
-  { href: "/admin/chatgpt", label: "ChatGPT helper", note: "Describe a change, paste ChatGPT's answer, done" },
   { href: "/admin/notifications", label: "Notifications", note: "Orders and alerts" },
   { href: "/admin/settings", label: "Settings", note: "Payments, shipping, linked accounts" },
 ];

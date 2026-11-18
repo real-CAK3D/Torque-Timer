@@ -41,11 +41,11 @@ export function Contact({ s }: { s: SiteSettings }) {
     <section id="contact" className="section contact">
       {/* ========================================================================
           EDIT-POINT: HOME-PAGE-SECTIONS
-          Fixed wording for the veteran badge, About and Contact sections used by
-          every layout. Most text comes from the dashboard; these headings don't.
+          Layout of the About and Contact sections used by every layout. The
+          words themselves come from site-variables.ts (about, contact).
           ======================================================================== */}
-      <h2>Get in touch</h2>
-      <p className="muted">Custom orders, questions or a status check on your order.</p>
+      <h2>{s.contactHeading}</h2>
+      {s.contactText ? <p className="muted">{s.contactText}</p> : null}
       <ul className="contact-list">
         {s.contactEmail ? (
           <li>

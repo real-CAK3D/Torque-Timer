@@ -31,6 +31,7 @@ export function SettingsForm({ initial, status, webhookUrl, siteUrl, vapidKey, d
   return (
     <>
       <div className="page-head"><h1>Settings</h1></div>
+      <p className="muted">Store settings also live in <code>site-variables.ts</code> on GitHub. Whichever is changed most recently wins.</p>
 
       <section className="panel">
         <div className="panel-head"><h2>Store</h2></div>
@@ -48,6 +49,9 @@ export function SettingsForm({ initial, status, webhookUrl, siteUrl, vapidKey, d
               <label className="f"><span>Flat shipping price</span><input inputMode="decimal" defaultValue={dollars(s.shippingFlat)} onBlur={(e) => set({ shippingFlat: cents(e.target.value) })} /></label>
               <label className="f"><span>Free shipping on orders over <em className="muted">(0 = never)</em></span><input inputMode="decimal" defaultValue={dollars(s.freeShippingOver)} onBlur={(e) => set({ freeShippingOver: cents(e.target.value) })} /></label>
             </div>
+          ) : null}
+          {s.collectShipping ? (
+            <label className="f"><span>Ship to countries <em className="muted">(two-letter codes, comma separated)</em></span><input defaultValue={s.shipCountries.join(", ")} onBlur={(e) => set({ shipCountries: e.target.value.split(",").map((c) => c.trim().toUpperCase()).filter((c) => /^[A-Z]{2}$/.test(c)) })} /></label>
           ) : null}
         </div>
       </section>

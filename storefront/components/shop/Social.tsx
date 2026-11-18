@@ -3,8 +3,9 @@ import type { SocialLinks } from "@/lib/types";
 /* ========================================================================
  * EDIT-POINT: SOCIAL-NETWORKS
  * Social sites shown in the footer/contact. To add one (e.g. pinterest):
- * add it here, to SocialLinks in lib/types.ts, to the Words & logos form
- * (components/admin/ContentForm.tsx) and to the allowed list in lib/changes.ts.
+ * add it here, to SocialLinks in lib/types.ts, to "social" in
+ * lib/site-variables-type.ts and site-variables.ts, and to the Words & logos
+ * form (components/admin/ContentForm.tsx).
  * ======================================================================== */
 const NAMES: Record<keyof SocialLinks, string> = {
   facebook: "Facebook",

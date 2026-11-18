@@ -88,6 +88,10 @@ export type SiteSettings = {
   announcement: string;
   heroHeadline: string;
   heroText: string;
+  featuredHeading: string;
+  allItemsHeading: string;
+  contactHeading: string;
+  contactText: string;
   aboutTitle: string;
   about: string;
   serviceLine: string; // e.g. "U.S. Army Military Police, 2004–2012"
@@ -110,8 +114,10 @@ export type SiteSettings = {
   storeOpen: boolean;
   closedMessage: string;
   lowStockAlert: number;
+  shipCountries: string[];
   // Owner tools
   githubRepo: string;
   vercelProject: string;
   customLinks: CustomLink[];
+  expenseCategories: string[];
 };

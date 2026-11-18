@@ -60,11 +60,7 @@ export async function POST(req: Request) {
       // Card, Apple Pay, Google Pay and Link show up automatically based on your Stripe dashboard settings.
       ...(settings.collectShipping
         ? {
-            /* ========================================================================
-             * EDIT-POINT: SHIPPING-COUNTRIES
-             * Countries you ship to, as two-letter codes ("US", "CA", "GB", ...).
-             * ======================================================================== */
-            shipping_address_collection: { allowed_countries: ["US", "CA"] },
+            shipping_address_collection: { allowed_countries: (settings.shipCountries.length ? settings.shipCountries : ["US"]) as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] },
             shipping_options: [
               {
                 shipping_rate_data: {
